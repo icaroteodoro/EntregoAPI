@@ -7,7 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -50,6 +49,18 @@ public class Address {
 
 	public Address() {
 		super();
+	}
+	
+	public Address(Address address) {
+		super();
+		this.cep = address.getCep();
+		this.number = address.getNumber();
+		this.street = address.getStreet();
+		this.neighborhood = address.getNeighborhood();
+		this.city = address.getCity();
+		this.country = address.getCountry();
+		this.isMain = address.isMain();
+		this.user = address.getUser();
 	}
 
 

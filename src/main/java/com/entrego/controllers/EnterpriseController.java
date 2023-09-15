@@ -1,6 +1,5 @@
 package com.entrego.controllers;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,31 +10,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.entrego.dtos.UserDTO;
-import com.entrego.entity.User;
-import com.entrego.services.UserService;
+import com.entrego.dtos.EnterpriseDTO;
+import com.entrego.entity.Enterprise;
+import com.entrego.services.EnterpriseService;
 
 @RestController
-@RequestMapping("/user")
-public class UserController {
+@RequestMapping("/enterprise")
+public class EnterpriseController {
 	@Autowired
-	private UserService userService;
+	private EnterpriseService enterpriseService;
+	
 	
 	@PostMapping
-	public User saveUser(@RequestBody UserDTO user) {
-		User newUser = this.userService.createUser(user);
-		return newUser;
+	private Enterprise saveEnterprise(@RequestBody EnterpriseDTO data) {
+		return enterpriseService.createEnterprise(data);
 	}
 	
 	@GetMapping
-	public List<User> allUsers() {
-		return this.userService.findAllUsers();
+	private List<Enterprise> allEnterprises(){
+		return this.enterpriseService.findAllEnterprises();
 	}
 	
 	@GetMapping
 	@RequestMapping("/{id}")
-	public User findUserById(@PathVariable String id) throws Exception {
-		return this.userService.findUserById(id);
+	public Enterprise findEnterpriseById(@PathVariable String id) throws Exception {
+		return this.enterpriseService.findEnterpriseById(id);
 	}
 	
+
 }

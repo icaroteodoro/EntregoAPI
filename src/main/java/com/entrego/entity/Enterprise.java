@@ -3,6 +3,8 @@ package com.entrego.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.entrego.dtos.EnterpriseDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,6 +45,25 @@ public class Enterprise {
 	
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
+	
+	public Enterprise() {
+		super();
+	}
+	
+	public Enterprise(EnterpriseDTO data) {
+		this.name = data.name();
+		this.document = data.document();
+		this.email = data.email();
+		this.description = data.description();
+		Address newAddress = new Address(data.address());
+		this.address = newAddress;
+		this.requests = data.requests();
+		this.products = data.products();
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+	}
+	
+	
 	public String getName() {
 		return name;
 	}

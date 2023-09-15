@@ -2,6 +2,8 @@ package com.entrego.entity;
 
 import java.time.LocalDateTime;
 
+import com.entrego.dtos.ProductDTO;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,6 +34,20 @@ public class Product {
 	
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
+	
+	public Product() {
+		
+	}
+	
+	public Product(ProductDTO data) {
+		this.name = data.name();
+		this.price = data.price();
+		this.discount = data.discount();
+		this.enterprise = data.enterprise();
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+	}
+	
 	public String getName() {
 		return name;
 	}
