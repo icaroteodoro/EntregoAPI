@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.entrego.dtos.UserDTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,18 +38,13 @@ public class User {
 	private String cell;
 	@Column(unique = true)
 	private String document;
+	@JsonIgnore
 	private LocalDateTime createdAt;
+	@JsonIgnore
 	private LocalDateTime updatedAt;
 	@OneToMany
-	private List<Address> address;
-	@OneToMany
+	@JsonIgnore
 	private List<Request> requests;
-	
-	
-	
-	public User() {
-		super();
-	}
 
 	public User(UserDTO data) {
 		this.firstName = data.firstName();
@@ -61,87 +57,6 @@ public class User {
 		this.requests = data.requests();
 	}
 
-	public String getFirstName() {
-		return firstName;
-	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getCell() {
-		return cell;
-	}
-
-	public void setCell(String cell) {
-		this.cell = cell;
-	}
-
-	public String getDocument() {
-		return document;
-	}
-
-	public void setDocument(String document) {
-		this.document = document;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-
-	public List<Address> getAddress() {
-		return address;
-	}
-
-	public void setAddress(List<Address> address) {
-		this.address = address;
-	}
-	
-	public void addAddress(Address address) {
-		this.address.add(address);
-	}
-
-	public List<Request> getRequests() {
-		return requests;
-	}
-
-	public void setRequests(List<Request> requests) {
-		this.requests = requests;
-	}
-
-	public String getId() {
-		return id;
-	}
-	
-	
-	
 	
 }

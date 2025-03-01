@@ -21,7 +21,7 @@ public class ProductController {
 	
 	
 	@PostMapping
-	public Product saveProduct(@RequestBody ProductDTO data) {
+	public Product saveProduct(@RequestBody ProductDTO data) throws Exception {
 		return this.productService.createProduct(data); 
 	}
 	

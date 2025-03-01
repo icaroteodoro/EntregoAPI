@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.entrego.dtos.ProductDTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,64 +31,20 @@ public class Product {
 	private Double price;
 	private int discount;
 	@ManyToOne
+	@JsonIgnore
 	private Enterprise enterprise;
-	
+	@JsonIgnore
 	private LocalDateTime createdAt;
+	@JsonIgnore
 	private LocalDateTime updatedAt;
-	
-	public Product() {
-		
-	}
-	
+
 	public Product(ProductDTO data) {
 		this.name = data.name();
 		this.price = data.price();
 		this.discount = data.discount();
-		this.enterprise = data.enterprise();
 		this.createdAt = LocalDateTime.now();
 		this.updatedAt = LocalDateTime.now();
 	}
-	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public Double getPrice() {
-		return price;
-	}
-	public void setPrice(Double price) {
-		this.price = price;
-	}
-	public int getDiscount() {
-		return discount;
-	}
-	public void setDiscount(int discount) {
-		this.discount = discount;
-	}
-	public Enterprise getEnterprise() {
-		return enterprise;
-	}
-	public void setEnterprise(Enterprise enterprise) {
-		this.enterprise = enterprise;
-	}
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-	public String getId() {
-		return id;
-	}
-	
 	
 	
 }

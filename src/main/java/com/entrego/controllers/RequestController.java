@@ -2,13 +2,11 @@ package com.entrego.controllers;
 
 import java.util.List;
 
+import com.entrego.dtos.RequestUpdateStatusOfRequest;
+import com.entrego.enums.OrderStatus;
+import jakarta.persistence.criteria.Order;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.entrego.dtos.RequestDTO;
 import com.entrego.entity.Request;
@@ -23,29 +21,29 @@ public class RequestController {
 	private RequestService requestService;
 	
 	@PostMapping
-	public Request createRequest(@RequestBody RequestDTO data){
-		Request newRequest = new Request(data);
-		this.requestService.createRequest(data);
-		return newRequest;
-	}
-	
-	@GetMapping
-	public List<Request> findAllRequests(){
-		return this.findAllRequests();
+	public Request createRequest(@RequestBody RequestDTO data) throws Exception {
+        return this.requestService.createRequest(data);
 	}
 	
 	
 	@GetMapping
-	@RequestMapping("/user/{id}")
-	public List<Request> findRequestsByUserId(@PathVariable String id){
-		return requestService.findRequestsByUserId(id);
+	@RequestMapping("/user/{userId}")
+	public List<Request> findRequestsByUserId(@PathVariable String userId){
+		return requestService.findRequestsByUserId(userId);
 	}
 	
 	@GetMapping
-	@RequestMapping("/enterprise/{id}")
-	public List<Request> findRequestsByEnterpriseId(@PathVariable String id){
-		return requestService.findRequestsByEnterpriseId(id);
+	@RequestMapping("/enterprise/{enterpriseId}")
+	public List<Request> findRequestsByEnterpriseId(@PathVariable String enterpriseId){
+		return requestService.findRequestsByEnterpriseId(enterpriseId);
 	}
+
+	@PutMapping
+	@RequestMapping("/update-status/{requestId}")
+	public Request updateStatusByRequestId (@PathVariable String requestId, @RequestBody RequestUpdateStatusOfRequest data) {
+		return this.requestService.updateStatusByRequestId(requestId, OrderStatus.fromValue(data.status()));
+	}
+
 
 	
 }

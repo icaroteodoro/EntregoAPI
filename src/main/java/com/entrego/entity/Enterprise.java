@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.entrego.dtos.EnterpriseDTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -37,19 +38,20 @@ public class Enterprise {
 	private String email;
 	private String description;
 	@OneToOne
+	@JsonIgnore
 	private Address address;
 	@OneToMany
+	@JsonIgnore
 	private List<Request> requests;
 	@OneToMany
+	@JsonIgnore
 	private List<Product> products;
-	
+
+	@JsonIgnore
 	private LocalDateTime createdAt;
+	@JsonIgnore
 	private LocalDateTime updatedAt;
-	
-	public Enterprise() {
-		super();
-	}
-	
+
 	public Enterprise(EnterpriseDTO data) {
 		this.name = data.name();
 		this.document = data.document();
@@ -62,67 +64,5 @@ public class Enterprise {
 		this.createdAt = LocalDateTime.now();
 		this.updatedAt = LocalDateTime.now();
 	}
-	
-	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getDocument() {
-		return document;
-	}
-	public void setDocument(String document) {
-		this.document = document;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	public Address getAddress() {
-		return address;
-	}
-	public void setAddress(Address address) {
-		this.address = address;
-	}
-	public List<Request> getRequests() {
-		return requests;
-	}
-	public void setRequests(List<Request> requests) {
-		this.requests = requests;
-	}
-	public List<Product> getProducts() {
-		return products;
-	}
-	public void setProducts(List<Product> products) {
-		this.products = products;
-	}
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-	public String getId() {
-		return id;
-	}
-	
-	
-	
 	
 }

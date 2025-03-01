@@ -2,11 +2,10 @@ package com.entrego.controllers;
 
 import java.util.List;
 
+import com.entrego.dtos.AddressDTO;
+import com.entrego.services.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.entrego.entity.Address;
 import com.entrego.repositories.AddressRepository;
@@ -16,15 +15,25 @@ import com.entrego.repositories.AddressRepository;
 public class AddressController {
 	
 	@Autowired
-	private AddressRepository repository;
+	private AddressService addressService;
 	
+
+
 	@GetMapping
 	public List<Address> findAllAddress() {
-		return this.repository.findAll();
+		return this.addressService.findAllAddress();
 	}
+
+	@PostMapping
+	@RequestMapping("/save-new-address-for-user/{userId}")
+	public Address saveNewAddressForUser(@PathVariable String userId, @RequestBody AddressDTO data) throws Exception {
+		Address newAddress = new Address(data);
+		return this.addressService.saveNewAddressForUser(userId, newAddress);
+	}
+
 	@GetMapping
-	@RequestMapping("/{id}")
-	public List<Address> findAllAddressByUserId(@PathVariable String id){
-		return this.repository.findAddressByUserId(id);
+	@RequestMapping("/{userId}")
+	public List<Address> findAllAddressByUserId(@PathVariable String userId){
+		return this.addressService.findAddressByUserId(userId);
 	}
 }
