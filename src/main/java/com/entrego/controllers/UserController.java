@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.entrego.dtos.UserDTO;
-import com.entrego.entity.User;
+import com.entrego.dtos.RegisterUserRequestDTO;
+import com.entrego.domain.User;
 import com.entrego.services.UserService;
 
 @RestController
@@ -22,7 +22,7 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping
-	public User saveUser(@RequestBody UserDTO user) {
+	public User saveUser(@RequestBody RegisterUserRequestDTO user) {
 		User newUser = this.userService.createUser(user);
 		return newUser;
 	}

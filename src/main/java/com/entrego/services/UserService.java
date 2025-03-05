@@ -4,18 +4,23 @@ package com.entrego.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.entrego.dtos.UserDTO;
-import com.entrego.entity.Address;
-import com.entrego.entity.User;
+import com.entrego.dtos.RegisterUserRequestDTO;
+import com.entrego.domain.Address;
+import com.entrego.domain.User;
 import com.entrego.repositories.UserRepository;
 
 @Service
 public class UserService {
 	@Autowired
 	private UserRepository repository;
-	
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
+
 	@Autowired
 	private AddressService addressService;
 
@@ -24,8 +29,9 @@ public class UserService {
 		return this.repository.findUserById(id).orElseThrow(() -> new Exception("User not found"));
 	}
 	
-	public User createUser(UserDTO data) {
+	public User createUser(RegisterUserRequestDTO data) {
 		User newUser = new User(data);
+		newUser.setPassword(passwordEncoder.encode(data.password()));
 		this.saveUser(newUser);
 		Address newAddress = new Address(data.address().get(0));
 		newAddress.setUser(newUser);

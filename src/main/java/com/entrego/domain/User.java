@@ -1,9 +1,9 @@
-package com.entrego.entity;
+package com.entrego.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.entrego.dtos.EnterpriseDTO;
+import com.entrego.dtos.RegisterUserRequestDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
@@ -12,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -20,49 +19,44 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity(name = "enterprises")
-@Table(name = "enterprises")
+@Entity(name = "users")
+@Table(name = "users")
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of="id")
-public class Enterprise {
+public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
-	private String name;
-	@Column(unique = true)
-	private String document;
+	private String firstName;
+	private String lastName;
 	@Column(unique = true)
 	private String email;
-	private String description;
-	@OneToOne
-	@JsonIgnore
-	private Address address;
-	@OneToMany
-	@JsonIgnore
-	private List<Request> requests;
-	@OneToMany
-	@JsonIgnore
-	private List<Product> products;
-
+	private String password;
+	@Column(unique = true)
+	private String cell;
+	@Column(unique = true)
+	private String document;
 	@JsonIgnore
 	private LocalDateTime createdAt;
 	@JsonIgnore
 	private LocalDateTime updatedAt;
+	@OneToMany
+	@JsonIgnore
+	private List<Order> orders;
 
-	public Enterprise(EnterpriseDTO data) {
-		this.name = data.name();
-		this.document = data.document();
+	public User(RegisterUserRequestDTO data) {
+		this.firstName = data.firstName();
+		this.lastName = data.lastName();
 		this.email = data.email();
-		this.description = data.description();
-		Address newAddress = new Address(data.address());
-		this.address = newAddress;
-		this.requests = data.requests();
-		this.products = data.products();
+		this.cell = data.cell();
+		this.document = data.document();
 		this.createdAt = LocalDateTime.now();
 		this.updatedAt = LocalDateTime.now();
+		this.orders = data.orders();
 	}
-	
+
+
 }

@@ -3,13 +3,13 @@ package com.entrego.services;
 
 import java.util.List;
 
-import com.entrego.entity.Enterprise;
-import com.entrego.repositories.EnterpriseRepository;
+import com.entrego.domain.Store;
+import com.entrego.repositories.StoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.entrego.dtos.ProductDTO;
-import com.entrego.entity.Product;
+import com.entrego.domain.Product;
 import com.entrego.repositories.ProductsRepository;
 
 @Service
@@ -19,7 +19,7 @@ public class ProductService {
 	private ProductsRepository repository;
 
 	@Autowired
-	private EnterpriseRepository enterpriseRepository;
+	private StoreRepository storeRepository;
 	
 	public Product findProductById(String id) throws Exception {
 		return this.repository.findById(id).orElseThrow(() -> new Exception("User not found"));
@@ -27,9 +27,9 @@ public class ProductService {
 	
 	public Product createProduct(ProductDTO data) throws Exception {
 		Product newProduct = new Product(data);
-		Enterprise enterprise = this.enterpriseRepository.findById(data.enterpriseId()).orElseThrow(() -> new Exception("Enterprise not found"));
+		Store store = this.storeRepository.findById(data.storeId()).orElseThrow(() -> new Exception("Store not found"));
 
-		newProduct.setEnterprise(enterprise);
+		newProduct.setStore(store);
 
 		this.saveProduct(newProduct);
 		

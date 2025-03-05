@@ -1,4 +1,4 @@
-package com.entrego.entity;
+package com.entrego.domain;
 
 import com.entrego.dtos.AddressDTO;
 

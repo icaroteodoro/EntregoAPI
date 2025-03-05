@@ -1,4 +1,4 @@
-package com.entrego.entity;
+package com.entrego.domain;
 
 import java.time.LocalDateTime;
 
@@ -32,7 +32,7 @@ public class Product {
 	private int discount;
 	@ManyToOne
 	@JsonIgnore
-	private Enterprise enterprise;
+	private Store store;
 	@JsonIgnore
 	private LocalDateTime createdAt;
 	@JsonIgnore

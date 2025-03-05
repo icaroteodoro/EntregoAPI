@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.entrego.dtos.ProductDTO;
-import com.entrego.entity.Product;
+import com.entrego.domain.Product;
 import com.entrego.services.ProductService;
 
 @RestController

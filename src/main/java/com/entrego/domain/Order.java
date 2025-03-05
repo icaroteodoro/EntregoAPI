@@ -1,10 +1,9 @@
-package com.entrego.entity;
+package com.entrego.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
-import com.entrego.dtos.RequestDTO;
+import com.entrego.dtos.OrderDTO;
 
 import com.entrego.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,14 +17,14 @@ import lombok.Setter;
 
 
 
-@Entity(name = "requests")
-@Table(name = "requests")
+@Entity(name = "orders")
+@Table(name = "orders")
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of="id")
-public class Request {
+public class Order {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
@@ -37,14 +36,14 @@ public class Request {
 	private User user;
 	@ManyToOne
 	@JsonIgnore
-	private Enterprise enterprise;
+	private Store store;
 	@ManyToMany
 	@JsonIgnore
 	private List<Product> products;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 
-	public Request(RequestDTO data) {
+	public Order(OrderDTO data) {
 		this.status = OrderStatus.MADE;
 		this.products = data.products();
 		this.createdAt = LocalDateTime.now();

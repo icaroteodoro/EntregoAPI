@@ -7,8 +7,7 @@ import com.entrego.services.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.entrego.entity.Address;
-import com.entrego.repositories.AddressRepository;
+import com.entrego.domain.Address;
 
 @RestController
 @RequestMapping("/address")
