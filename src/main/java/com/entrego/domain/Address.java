@@ -2,6 +2,7 @@ package com.entrego.domain;
 
 import com.entrego.dtos.AddressDTO;
 
+import com.entrego.dtos.AddressStoreDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +31,7 @@ public class Address {
 	private String cep;
 	private String number;
 	private String street;
+	private String complement;
 	private String neighborhood;
 	private String city;
 	private String country;
@@ -42,10 +44,22 @@ public class Address {
 		this.cep = data.cep();
 		this.number = data.number();
 		this.street = data.street();
+		this.complement = data.complement();
 		this.neighborhood = data.neighborhood();
 		this.city = data.city();
 		this.country = data.country();
 		this.isMain = data.isMain();
+	}
+
+	public Address(AddressStoreDTO data) {
+		this.cep = data.cep();
+		this.number = data.number();
+		this.street = data.street();
+		this.complement = data.complement();
+		this.neighborhood = data.neighborhood();
+		this.city = data.city();
+		this.country = data.country();
+		this.isMain = true;
 	}
 
 	public Address(Address address) {
@@ -53,6 +67,7 @@ public class Address {
 		this.cep = address.getCep();
 		this.number = address.getNumber();
 		this.street = address.getStreet();
+		this.complement = address.getComplement();
 		this.neighborhood = address.getNeighborhood();
 		this.city = address.getCity();
 		this.country = address.getCountry();

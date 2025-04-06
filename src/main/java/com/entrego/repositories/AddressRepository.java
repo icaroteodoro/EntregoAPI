@@ -11,4 +11,6 @@ import com.entrego.domain.Address;
 public interface AddressRepository extends JpaRepository<Address, String> {
 	@Query(nativeQuery = true, value = "SELECT * FROM address WHERE user_id = :id")
 	List<Address> findAddressByUserId(String id);
+	@Query(nativeQuery = true, value = "SELECT * FROM address WHERE user_id = :id AND is_main = 1")
+	Address findAddressByUserIdAndIsMain(String id);
 }

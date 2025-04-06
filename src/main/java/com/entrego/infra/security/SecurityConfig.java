@@ -31,6 +31,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/user/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/store/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/store/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/store/refresh-token").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/user/refresh-token").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);

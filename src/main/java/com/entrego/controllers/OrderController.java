@@ -3,6 +3,8 @@ package com.entrego.controllers;
 import java.util.List;
 
 import com.entrego.domain.Order;
+import com.entrego.dtos.OrderResponse;
+import com.entrego.dtos.RequestOrderStatusUpdate;
 import com.entrego.dtos.RequestUpdateStatusOfRequest;
 import com.entrego.enums.OrderStatus;
 import com.entrego.services.OrderService;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import com.entrego.dtos.OrderDTO;
 
 @RestController
-@RequestMapping("/request")
+@RequestMapping("/order")
 public class OrderController {
 	
 
@@ -31,11 +33,11 @@ public class OrderController {
 		return orderService.findOrdersByUserId(userId);
 	}
 	
-	@GetMapping
-	@RequestMapping("/enterprise/{storeId}")
-	public List<Order> findOrdersByStoreId(@PathVariable String storeId){
-		return orderService.findOrdersByStoreId(storeId);
-	}
+	//@GetMapping
+	//@RequestMapping("/store/{storeId}")
+	//public List<Order> findOrdersByStoreId(@PathVariable String storeId){
+	//	return orderService.findOrdersByStoreId(storeId);
+	//}
 
 	@PutMapping
 	@RequestMapping("/update-status/{orderId}")
@@ -43,6 +45,24 @@ public class OrderController {
 		return this.orderService.updateStatusByOrderId(orderId, OrderStatus.fromValue(data.status()));
 	}
 
+	@GetMapping
+	@RequestMapping("/store/{email}")
+	public List<OrderResponse> findOrdersByStoreEmail(@PathVariable String email) {
+		return this.orderService.findOrdersByStoreEmail(email);
+	}
 
+	@GetMapping
+	@RequestMapping("/store/today/{email}")
+	public List<OrderResponse> findOrdersByStoreEmailToday(@PathVariable String email) {
+		return this.orderService.findOrdersByStoreEmailToday(email);
+	}
+
+
+	@PutMapping("/update")
+	public Order updateStatusOrder(@RequestBody RequestOrderStatusUpdate data) throws Exception {
+		Order order = this.orderService.findOrderById(data.orderId());
+		order.setStatus(data.status());
+		return this.orderService.updateStatusOrder(order);
+	}
 	
 }

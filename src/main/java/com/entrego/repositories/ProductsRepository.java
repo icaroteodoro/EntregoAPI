@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.entrego.domain.Product;
 
-public interface ProductsRepository extends JpaRepository<Product, String> {
+import java.util.List;
 
+public interface ProductsRepository extends JpaRepository<Product, String> {
+    List<Product> findProductsByStoreEmail(String email);
 }

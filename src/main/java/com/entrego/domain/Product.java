@@ -37,6 +37,9 @@ public class Product {
 	private LocalDateTime createdAt;
 	@JsonIgnore
 	private LocalDateTime updatedAt;
+	@ManyToOne
+	@JsonIgnore
+	private ProductCategory productCategory;
 
 	public Product(ProductDTO data) {
 		this.name = data.name();

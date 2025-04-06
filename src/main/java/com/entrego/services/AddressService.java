@@ -3,6 +3,7 @@ package com.entrego.services;
 import java.util.List;
 
 import com.entrego.domain.User;
+import com.entrego.dtos.AddressStoreDTO;
 import com.entrego.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,5 +48,18 @@ public class AddressService {
 	public List<Address> findAddressByUserId(String id) {
 		return this.repository.findAddressByUserId(id);
 	}
-	
+
+	public Address updateAddressById(String id, AddressStoreDTO data) throws Exception {
+		Address address = this.findAddressById(id);
+		System.out.println(address.getStreet());
+		address.setCep(data.cep());
+		address.setNumber(data.number());
+		address.setStreet(data.street());
+		address.setNeighborhood(data.neighborhood());
+		address.setComplement(data.complement());
+		address.setCity(data.city());
+		address.setCountry(data.country());
+		System.out.println(address);
+		return this.saveAddress(address);
+	}
 }

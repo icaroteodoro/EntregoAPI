@@ -28,7 +28,11 @@ public class UserService {
 	public User findUserById(String id) throws Exception {
 		return this.repository.findUserById(id).orElseThrow(() -> new Exception("User not found"));
 	}
-	
+
+	public User findUserByEmail(String email) throws Exception {
+		return this.repository.findUserByEmail(email).orElseThrow(() -> new Exception("User not found"));
+	}
+
 	public User createUser(RegisterUserRequestDTO data) {
 		User newUser = new User(data);
 		newUser.setPassword(passwordEncoder.encode(data.password()));

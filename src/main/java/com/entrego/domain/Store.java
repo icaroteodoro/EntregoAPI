@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.entrego.dtos.RegisterStoreRequestDTO;
 
+import com.entrego.enums.StoreCategoryEnum;
+import com.entrego.enums.StoreStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,6 +40,8 @@ public class Store {
 	private String email;
 	private String password;
 	private String description;
+	private StoreCategoryEnum category;
+	private StoreStatus statusLive;
 	@OneToOne
 	@JsonIgnore
 	private Address address;
@@ -47,6 +51,9 @@ public class Store {
 	@OneToMany
 	@JsonIgnore
 	private List<Product> products;
+	@OneToMany
+	@JsonIgnore
+	private List<ProductCategory> categories;
 
 	@JsonIgnore
 	private LocalDateTime createdAt;
@@ -58,9 +65,10 @@ public class Store {
 		this.document = data.document();
 		this.email = data.email();
 		this.description = data.description();
-		Address newAddress = new Address(data.address());
-		this.address = newAddress;
+		this.address = new Address(data.address());
+		this.statusLive = StoreStatus.fromValue("CLOSED");
 		this.orders = data.orders();
+		this.category = data.category();
 		this.products = data.products();
 		this.createdAt = LocalDateTime.now();
 		this.updatedAt = LocalDateTime.now();

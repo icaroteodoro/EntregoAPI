@@ -1,6 +1,8 @@
 package com.entrego.dtos;
 
 
-public record ProductDTO(String name, Double price, int discount, String storeId) {
+import com.entrego.domain.ProductCategory;
+
+public record ProductDTO(String name, Double price, String productCategoryId, int discount, String storeId) {
 
 }

@@ -34,6 +34,13 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = this.recoverToken(request);
         var login = tokenService.validateToken(token);
 
+        if(token != null){
+            if(tokenService.isTokenExpired(token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid or expired token");
+                return;
+            }
+        }
         if (login != null) {
             Object authenticatedEntity = null;
             List<SimpleGrantedAuthority> authorities;
@@ -48,17 +55,15 @@ public class SecurityFilter extends OncePerRequestFilter {
                     authenticatedEntity = store.get();
                     authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_STORE"));
                 } else {
-                    throw new RuntimeException("User or Store not found");
+                    throw new RuntimeException("User not found");
                 }
             }
 
             var authentication = new UsernamePasswordAuthenticationToken(authenticatedEntity, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         filterChain.doFilter(request, response);
     }
-
 
     private String recoverToken(HttpServletRequest request){
         var authHeader = request.getHeader("Authorization");

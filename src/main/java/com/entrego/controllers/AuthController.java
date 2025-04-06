@@ -2,10 +2,7 @@ package com.entrego.controllers;
 
 import com.entrego.domain.Store;
 import com.entrego.domain.User;
-import com.entrego.dtos.LoginUserRequestDTO;
-import com.entrego.dtos.LoginUserResponseDTO;
-import com.entrego.dtos.RegisterStoreRequestDTO;
-import com.entrego.dtos.RegisterUserRequestDTO;
+import com.entrego.dtos.*;
 import com.entrego.infra.security.TokenService;
 import com.entrego.repositories.StoreRepository;
 import com.entrego.repositories.UserRepository;
@@ -44,7 +41,8 @@ public class AuthController {
         User user = this.userRepository.findUserByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
         if(passwordEncoder.matches(body.password(), user.getPassword())) {
             String token = this.tokenService.generateTokenUser(user);
-            return ResponseEntity.ok(new LoginUserResponseDTO(user.getFirstName(), token));
+            String refreshToken = this.tokenService.generateRefreshTokenUser(user);
+            return ResponseEntity.ok(new LoginUserResponseDTO(user.getFirstName(), token, refreshToken));
         }
         return ResponseEntity.notFound().build();
     }
@@ -54,7 +52,8 @@ public class AuthController {
         try{
             User newUser = this.userService.createUser(body);
             String token = this.tokenService.generateTokenUser(newUser);
-            return ResponseEntity.ok(new LoginUserResponseDTO( newUser.getFirstName(), token));
+            String refreshToken  = this.tokenService.generateRefreshTokenUser(newUser);
+            return ResponseEntity.ok(new LoginUserResponseDTO( newUser.getFirstName(), token, refreshToken));
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -63,9 +62,11 @@ public class AuthController {
     @PostMapping("/store/login")
     public ResponseEntity<?> storeLogin(@RequestBody LoginUserRequestDTO body) throws Exception {
         Store store = this.storeService.findStoreByEmail(body.email());
+        System.out.println(store.getName());
         if(passwordEncoder.matches(body.password(), store.getPassword())) {
             String token = this.tokenService.generateTokenStore(store);
-            return ResponseEntity.ok(new LoginUserResponseDTO(store.getName(), token));
+            String refreshToken = this.tokenService.generateRefreshTokenStore(store);
+            return ResponseEntity.ok(new LoginUserResponseDTO(store.getName(), token, refreshToken));
         }
         return ResponseEntity.notFound().build();
     }
@@ -75,10 +76,38 @@ public class AuthController {
         try{
             Store newStore = this.storeService.createStore(body);
             String token = this.tokenService.generateTokenStore(newStore);
-            return ResponseEntity.ok(new LoginUserResponseDTO( newStore.getName(), token));
+            String refreshToken = this.tokenService.generateRefreshTokenStore(newStore);
+            return ResponseEntity.ok(new LoginUserResponseDTO(newStore.getName(), token, refreshToken));
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+
+    @PostMapping("/user/refresh-token")
+    public ResponseEntity<?> createNewTokenForUser(@RequestBody RequestRefreshToken data) throws Exception {
+        try{
+            String refresh = this.tokenService.validateToken(data.refreshToken());
+            User user = this.userService.findUserByEmail(refresh);
+            String token = this.tokenService.generateTokenUser(user);
+            String refreshToken = this.tokenService.generateRefreshTokenUser(user);
+            return ResponseEntity.ok(new LoginUserResponseDTO(user.getFirstName() +" "+ user.getLastName(), token, refreshToken));
+        } catch(Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @PostMapping("/store/refresh-token")
+    public ResponseEntity<?> createNewTokenForStore(@RequestBody RequestRefreshToken data) throws Exception {
+        try{
+            String refresh = this.tokenService.validateToken(data.refreshToken());
+            Store store = this.storeService.findStoreByEmail(refresh);
+            String token = this.tokenService.generateTokenStore(store);
+            String refreshToken = this.tokenService.generateRefreshTokenStore(store);
+            return ResponseEntity.ok(new LoginUserResponseDTO(store.getName(), token, refreshToken));
+        } catch(Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
 }

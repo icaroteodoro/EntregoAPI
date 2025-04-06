@@ -3,6 +3,7 @@ package com.entrego.controllers;
 import java.util.List;
 
 import com.entrego.dtos.AddressDTO;
+import com.entrego.dtos.AddressStoreDTO;
 import com.entrego.services.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,5 +35,12 @@ public class AddressController {
 	@RequestMapping("/{userId}")
 	public List<Address> findAllAddressByUserId(@PathVariable String userId){
 		return this.addressService.findAddressByUserId(userId);
+	}
+
+	@PutMapping
+	@RequestMapping("/store/update/{id}")
+	public Address updateStoreAddressByStoreEmail(@PathVariable String id, @RequestBody AddressStoreDTO data) throws Exception {
+		System.out.println(data.street());
+		return this.addressService.updateAddressById(id, data);
 	}
 }
