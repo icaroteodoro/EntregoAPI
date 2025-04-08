@@ -36,6 +36,9 @@ public class OrderService {
 
 	@Autowired
 	private AddressRepository addressRepository;
+	
+	@Autowired
+	private NotificationService notificationService;
 
 	public Order createOrder(OrderDTO request) throws Exception {
 		Order newOrder = new Order(request);
@@ -65,6 +68,10 @@ public class OrderService {
 		newOrder.setTotal(total);
 
 		this.repository.save(newOrder);
+		
+		// Enviar notificação de criação de pedido
+		this.notificationService.notifyOrderCreated(newOrder);
+		
 		return newOrder;
 	}
 
@@ -73,7 +80,13 @@ public class OrderService {
 		Order order = this.repository.getReferenceById(requestId);
 		order.setStatus(status);
 		order.setUpdatedAt(LocalDateTime.now());
-		return this.repository.save(order);
+		
+		Order updatedOrder = this.repository.save(order);
+		
+		// Enviar notificação de alteração de status
+		this.notificationService.notifyOrderStatusChanged(updatedOrder);
+		
+		return updatedOrder;
 	}
 
 	
@@ -176,7 +189,12 @@ public class OrderService {
 
 
 	public Order updateStatusOrder(Order order){
-		return this.repository.save(order);
+		Order updatedOrder = this.repository.save(order);
+		
+		// Enviar notificação de alteração de status
+		this.notificationService.notifyOrderStatusChanged(updatedOrder);
+		
+		return updatedOrder;
 	}
 
 	public Order findOrderById(String id) throws Exception {

@@ -28,40 +28,61 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Autowired
     private StoreRepository storeRepository;
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        return path.startsWith("/ws") || 
+               path.startsWith("/static") || 
+               path.startsWith("/webjars") || 
+               path.equals("/") || 
+               path.equals("/index.html") || 
+               path.startsWith("/notify-test") || 
+               path.endsWith(".js") || 
+               path.endsWith(".css") || 
+               path.endsWith(".ico");
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var token = this.recoverToken(request);
-        var login = tokenService.validateToken(token);
-
+        
         if(token != null){
-            if(tokenService.isTokenExpired(token)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid or expired token");
-                return;
-            }
-        }
-        if (login != null) {
-            Object authenticatedEntity = null;
-            List<SimpleGrantedAuthority> authorities;
-
-            var user = userRepository.findUserByEmail(login);
-            if (user.isPresent()) {
-                authenticatedEntity = user.get();
-                authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-            } else {
-                var store = storeRepository.findStoreByEmail(login);
-                if (store.isPresent()) {
-                    authenticatedEntity = store.get();
-                    authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_STORE"));
-                } else {
-                    throw new RuntimeException("User not found");
+            try {
+                var login = tokenService.validateToken(token);
+                
+                if(tokenService.isTokenExpired(token)) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Invalid or expired token");
+                    return;
                 }
-            }
+                
+                if (login != null) {
+                    Object authenticatedEntity = null;
+                    List<SimpleGrantedAuthority> authorities;
 
-            var authentication = new UsernamePasswordAuthenticationToken(authenticatedEntity, null, authorities);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                    var user = userRepository.findUserByEmail(login);
+                    if (user.isPresent()) {
+                        authenticatedEntity = user.get();
+                        authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+                    } else {
+                        var store = storeRepository.findStoreByEmail(login);
+                        if (store.isPresent()) {
+                            authenticatedEntity = store.get();
+                            authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_STORE"));
+                        } else {
+                            throw new RuntimeException("User not found");
+                        }
+                    }
+
+                    var authentication = new UsernamePasswordAuthenticationToken(authenticatedEntity, null, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (Exception e) {
+                // Log da exceção, mas não bloqueia a requisição
+                System.err.println("Erro ao processar token: " + e.getMessage());
+            }
         }
+        
         filterChain.doFilter(request, response);
     }
 

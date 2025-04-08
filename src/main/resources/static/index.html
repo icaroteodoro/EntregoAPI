@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Entrego - Notificações de Pedidos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        #notification-panel {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .notification {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-left: 4px solid #4CAF50;
+            border-radius: 4px;
+        }
+        .notification.new {
+            animation: highlight 2s ease-in-out;
+        }
+        @keyframes highlight {
+            0% { background-color: #4CAF50; }
+            100% { background-color: #f0f8ff; }
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .status {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .status.connected {
+            color: green;
+        }
+        .status.disconnected {
+            color: red;
+        }
+        select {
+            padding: 8px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .debug {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entrego - Notificações de Pedidos</h1>
+        
+        <div>
+            <p id="connection-status" class="status disconnected">Desconectado</p>
+            
+            <div>
+                <label for="store-id">ID da Loja:</label>
+                <input type="text" id="store-id" placeholder="Digite o ID da loja">
+                <button id="subscribe-button">Assinar</button>
+            </div>
+        </div>
+        
+        <h2>Notificações Recebidas</h2>
+        <div id="notification-panel"></div>
+        
+        <div class="debug">
+            <h3>Debug Info</h3>
+            <p id="debug-info"></p>
+            <button id="reconnect-button">Reconectar</button>
+            <button id="test-button">Enviar Teste</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <script>
+        let stompClient = null;
+        let currentSubscription = null;
+        const debugInfo = document.getElementById('debug-info');
+        
+        function addDebugInfo(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugInfo.innerHTML += `<br>[${timestamp}] ${message}`;
+        }
+        
+        function connect() {
+            addDebugInfo('Tentando conectar...');
+            
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null; // Desabilita logs internos do Stomp
+            
+            stompClient.connect({}, function(frame) {
+                document.getElementById('connection-status').textContent = 'Conectado';
+                document.getElementById('connection-status').className = 'status connected';
+                addDebugInfo('Conectado com sucesso!');
+                
+                // Assinar ao tópico geral de pedidos
+                try {
+                    stompClient.subscribe('/topic/orders', function(message) {
+                        addDebugInfo('Mensagem recebida no tópico geral');
+                        try {
+                            const notification = JSON.parse(message.body);
+                            showNotification(notification);
+                        } catch (e) {
+                            addDebugInfo('Erro ao processar mensagem: ' + e.message);
+                        }
+                    });
+                    addDebugInfo('Inscrito no tópico geral de pedidos');
+                } catch (e) {
+                    addDebugInfo('Erro ao se inscrever no tópico: ' + e.message);
+                }
+            }, function(error) {
+                document.getElementById('connection-status').textContent = 'Desconectado - Erro na conexão';
+                document.getElementById('connection-status').className = 'status disconnected';
+                addDebugInfo('Erro na conexão: ' + (error ? error.message : 'desconhecido'));
+                setTimeout(connect, 5000); // Tentar reconectar após 5 segundos
+            });
+        }
+        
+        function subscribeToStore(storeId) {
+            if (stompClient && stompClient.connected) {
+                addDebugInfo('Tentando se inscrever na loja: ' + storeId);
+                
+                // Se já estiver inscrito em um tópico específico de loja, cancelar inscrição
+                if (currentSubscription) {
+                    try {
+                        currentSubscription.unsubscribe();
+                        addDebugInfo('Cancelada inscrição anterior');
+                    } catch (e) {
+                        addDebugInfo('Erro ao cancelar inscrição: ' + e.message);
+                    }
+                }
+                
+                // Assinar ao tópico específico da loja
+                try {
+                    currentSubscription = stompClient.subscribe('/topic/orders/' + storeId, function(message) {
+                        addDebugInfo('Mensagem recebida no tópico da loja');
+                        try {
+                            const notification = JSON.parse(message.body);
+                            showNotification(notification, true);
+                        } catch (e) {
+                            addDebugInfo('Erro ao processar mensagem: ' + e.message);
+                        }
+                    });
+                    
+                    alert('Inscrito com sucesso no tópico da loja: ' + storeId);
+                    addDebugInfo('Inscrito com sucesso no tópico da loja: ' + storeId);
+                } catch (e) {
+                    addDebugInfo('Erro ao se inscrever no tópico da loja: ' + e.message);
+                    alert('Erro ao se inscrever: ' + e.message);
+                }
+            } else {
+                addDebugInfo('Não conectado ao websocket!');
+                alert('Não conectado ao websocket!');
+            }
+        }
+        
+        function showNotification(notification, highlight = false) {
+            addDebugInfo('Exibindo notificação para pedido: ' + notification.numberOrder);
+            
+            const panel = document.getElementById('notification-panel');
+            const notifElement = document.createElement('div');
+            notifElement.className = 'notification' + (highlight ? ' new' : '');
+            
+            // Formatar a data
+            const createdAt = new Date(notification.createdAt);
+            const formattedDate = createdAt.toLocaleString();
+            
+            notifElement.innerHTML = `
+                <h3>Pedido #${notification.numberOrder}</h3>
+                <p><strong>Cliente:</strong> ${notification.clientName}</p>
+                <p><strong>Status:</strong> ${notification.status}</p>
+                <p><strong>Total:</strong> R$ ${notification.total.toFixed(2)}</p>
+                <p><strong>Data:</strong> ${formattedDate}</p>
+            `;
+            
+            panel.prepend(notifElement);
+        }
+        
+        function sendTestMessage() {
+            if (stompClient && stompClient.connected) {
+                addDebugInfo('Enviando mensagem de teste...');
+                
+                const testNotification = {
+                    orderId: 'test-' + Date.now(),
+                    numberOrder: 'TEST-' + Math.floor(Math.random() * 1000),
+                    clientName: 'Cliente de Teste',
+                    storeId: document.getElementById('store-id').value || 'store-test',
+                    status: 'MADE',
+                    createdAt: new Date().toISOString(),
+                    total: 99.99
+                };
+                
+                try {
+                    stompClient.send('/app/send-notification', {}, JSON.stringify(testNotification));
+                    addDebugInfo('Mensagem de teste enviada com sucesso');
+                } catch (e) {
+                    addDebugInfo('Erro ao enviar mensagem de teste: ' + e.message);
+                }
+            } else {
+                addDebugInfo('Não conectado ao websocket!');
+            }
+        }
+        
+        // Conectar ao websocket quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            addDebugInfo('Página carregada, iniciando conexão...');
+            connect();
+            
+            // Configurar o botão de assinatura
+            document.getElementById('subscribe-button').addEventListener('click', function() {
+                const storeId = document.getElementById('store-id').value.trim();
+                if (storeId) {
+                    subscribeToStore(storeId);
+                } else {
+                    alert('Por favor, digite o ID da loja');
+                }
+            });
+            
+            // Configurar o botão de reconexão
+            document.getElementById('reconnect-button').addEventListener('click', function() {
+                addDebugInfo('Reconexão manual solicitada');
+                if (stompClient) {
+                    try {
+                        stompClient.disconnect();
+                        addDebugInfo('Desconectado manualmente');
+                    } catch (e) {
+                        addDebugInfo('Erro ao desconectar: ' + e.message);
+                    }
+                }
+                connect();
+            });
+            
+            // Configurar o botão de teste
+            document.getElementById('test-button').addEventListener('click', function() {
+                sendTestMessage();
+            });
+        });
+    </script>
+</body>
+</html> 
