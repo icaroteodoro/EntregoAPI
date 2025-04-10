@@ -37,6 +37,9 @@ public class OrderService {
 	@Autowired
 	private AddressRepository addressRepository;
 
+	@Autowired
+	private NotificationService notificationService;
+
 	public Order createOrder(OrderDTO request) throws Exception {
 		Order newOrder = new Order(request);
 
@@ -64,7 +67,10 @@ public class OrderService {
 
 		newOrder.setTotal(total);
 
-		this.repository.save(newOrder);
+		Order order = this.repository.save(newOrder);
+
+		this.notificationService.notifyOrderCreated(order);
+
 		return newOrder;
 	}
 
@@ -83,96 +89,32 @@ public class OrderService {
 	public List<Order> findOrdersByStoreId(String id){
 		return this.repository.findOrdersByStoreId(id);
 	}
+
 	public List<OrderResponse> findOrdersByStoreEmail(String email){
 		List<Order> orders = this.repository.findOrdersByStoreEmail(email);
 
-		List<OrderResponse> responses = new ArrayList<>();
+		List<OrderResponse> orderResponses = new ArrayList<>();
 
 		for (Order order: orders) {
-			List<Product> products = order.getProducts();
-			List<ItemsOrderResponse> items = new ArrayList<>();
-
-			// Mapa para contar a quantidade de cada produto
-			Map<Product, Integer> productCount = new HashMap<>();
-
-			// Conta a quantidade de cada produto na lista
-			for (Product product : products) {
-				productCount.put(product, productCount.getOrDefault(product, 0) + 1);
-			}
-
-			// Percorre o mapa e adiciona os itens à lista de resposta
-			for (Map.Entry<Product, Integer> entry : productCount.entrySet()) {
-				Product product = entry.getKey();
-				int quantity = entry.getValue();
-				double totalPrice = product.getPrice() * quantity; // Calcula o preço total
-
-				items.add(new ItemsOrderResponse(
-						product.getName(),  // Nome do produto
-						totalPrice,         // Preço total (preço unitário * quantidade)
-						quantity            // Quantidade do produto
-				));
-			}
-
-			OrderResponse orderResponse = new OrderResponse(
-						order.getId(),
-					order.getUser().getFirstName() + " " + order.getUser().getLastName(),
-						order.getNumberOrder(),
-						order.getCreatedAt(),
-						order.getStatus(),
-						this.addressRepository.findAddressByUserIdAndIsMain(order.getUser().getId()),
-						order.getPaymentMethod(),
-						items
-					);
-			responses.add(orderResponse);
+			orderResponses.add(order.getOrderResponse(this.addressRepository));
 		}
-		return responses;
+		return orderResponses;
 	}
 
 	public List<OrderResponse> findOrdersByStoreEmailToday(String email){
 		LocalDateTime date = LocalDateTime.now();
 		List<Order> orders = this.repository.findOrdersByStoreEmailAndCreatedAt_DayOfMonth(email, date.getDayOfMonth());
 
-		List<OrderResponse> responses = new ArrayList<>();
+		List<OrderResponse> orderResponses = new ArrayList<>();
 
 		for (Order order: orders) {
-			List<Product> products = order.getProducts();
-			List<ItemsOrderResponse> items = new ArrayList<>();
-
-			// Mapa para contar a quantidade de cada produto
-			Map<Product, Integer> productCount = new HashMap<>();
-
-			// Conta a quantidade de cada produto na lista
-			for (Product product : products) {
-				productCount.put(product, productCount.getOrDefault(product, 0) + 1);
-			}
-
-			// Percorre o mapa e adiciona os itens à lista de resposta
-			for (Map.Entry<Product, Integer> entry : productCount.entrySet()) {
-				Product product = entry.getKey();
-				int quantity = entry.getValue();
-				double totalPrice = product.getPrice() * quantity;
-
-				items.add(new ItemsOrderResponse(
-						product.getName(),
-						totalPrice,
-						quantity
-				));
-			}
-
-			OrderResponse orderResponse = new OrderResponse(
-					order.getId(),
-					order.getUser().getFirstName() + " " + order.getUser().getLastName(),
-					order.getNumberOrder(),
-					order.getCreatedAt(),
-					order.getStatus(),
-					this.addressRepository.findAddressByUserIdAndIsMain(order.getUser().getId()),
-					order.getPaymentMethod(),
-					items
-			);
-			responses.add(orderResponse);
+			orderResponses.add(order.getOrderResponse(this.addressRepository));
 		}
-		return responses;
+		return orderResponses;
 	}
+
+
+
 
 
 	public Order updateStatusOrder(Order order){
@@ -182,5 +124,8 @@ public class OrderService {
 	public Order findOrderById(String id) throws Exception {
 		return this.repository.findById(id).orElseThrow(() -> new Exception("Order not found"));
 	}
+
+
+
 
 }
