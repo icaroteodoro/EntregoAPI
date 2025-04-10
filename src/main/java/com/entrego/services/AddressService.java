@@ -62,4 +62,8 @@ public class AddressService {
 		System.out.println(address);
 		return this.saveAddress(address);
 	}
+
+	public Address findAddressByUserIdAndIsMain(String userId){
+		return this.repository.findAddressByUserIdAndIsMain(userId);
+	}
 }
