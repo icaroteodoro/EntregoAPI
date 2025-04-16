@@ -16,6 +16,7 @@ public class ProductCategoryController {
     private ProductCategoryService productCategoryService;
 
     @PostMapping
+    @RequestMapping("/create")
     public ProductCategory createProductCategory(@RequestBody RequestCreateProductCategory data) throws Exception {
         return productCategoryService.createCategory(data.name(), data.storeId());
     }

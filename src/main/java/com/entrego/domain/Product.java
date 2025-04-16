@@ -38,7 +38,6 @@ public class Product {
 	@JsonIgnore
 	private LocalDateTime updatedAt;
 	@ManyToOne
-	@JsonIgnore
 	private ProductCategory productCategory;
 
 	public Product(ProductDTO data) {

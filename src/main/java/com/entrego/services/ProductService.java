@@ -1,6 +1,7 @@
 package com.entrego.services;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.entrego.domain.ProductCategory;
@@ -31,6 +32,7 @@ public class ProductService {
 	
 	public Product createProduct(ProductDTO data) throws Exception {
 		Product newProduct = new Product(data);
+		System.out.println("Id: " + data.productCategoryId());
 		Store store = this.storeRepository.findById(data.storeId()).orElseThrow(() -> new Exception("Store not found"));
 		ProductCategory productCategory = this.productCategoryService.findProductCategoryById(data.productCategoryId());
 		newProduct.setStore(store);
@@ -46,6 +48,17 @@ public class ProductService {
 	
 	public void saveProduct(Product product) {
 		this.repository.save(product);
+	}
+
+	public Product updateProduct(String id, ProductDTO data) throws Exception {
+		Product product = this.repository.findById(id).orElseThrow(() -> new Exception("Product not found"));
+		product.setName(data.name());
+		product.setPrice(data.price());
+		product.setDiscount(data.discount());
+		ProductCategory productCategory = this.productCategoryService.findProductCategoryById(data.productCategoryId());
+		product.setProductCategory(productCategory);
+		product.setUpdatedAt(LocalDateTime.now());
+		return this.repository.save(product);
 	}
 	
 	public List<Product> findAllProducts(){
