@@ -7,17 +7,15 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import com.entrego.domain.*;
+import com.entrego.dtos.ItemOrderRequest;
 import com.entrego.dtos.ItemsOrderResponse;
 import com.entrego.dtos.OrderResponse;
 import com.entrego.enums.OrderStatus;
-import com.entrego.repositories.AddressRepository;
-import com.entrego.repositories.StoreRepository;
-import com.entrego.repositories.UserRepository;
+import com.entrego.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.entrego.dtos.OrderDTO;
-import com.entrego.repositories.OrderRepository;
 
 @Service
 public class OrderService {
@@ -35,6 +33,9 @@ public class OrderService {
 	private ProductService productService;
 
 	@Autowired
+	private ItemOrderRepository itemOrderRepository;
+
+	@Autowired
 	private AddressRepository addressRepository;
 
 	@Autowired
@@ -46,23 +47,31 @@ public class OrderService {
 		User user = this.userRepository.findUserById(request.userId()).orElseThrow(() -> new Exception("User not found"));
 		Store store = this.storeRepository.findById(request.storeId()).orElseThrow(() -> new Exception("Store not found"));
 
-		List<String> productIds = request.productIds();
-		List<Product> products = new ArrayList<Product>();
+		List<ItemOrderRequest> itemsOrderRequest = request.items();
+		List<ItemOrder> itemsOrder = new ArrayList<ItemOrder>();
 
-        for (String productId : productIds) {
-            Product product = this.productService.findProductById(productId);
-            products.add(product);
+        for (ItemOrderRequest item : itemsOrderRequest) {
+            Product product = this.productService.findProductById(item.productId());
+			ItemOrder itemRequest = new ItemOrder();
+			itemRequest.setName(product.getName());
+			itemRequest.setPrice(product.getPrice());
+			itemRequest.setQuantity(item.quantity());
+
+			ItemOrder newItem = this.itemOrderRepository.save(itemRequest);
+
+			itemsOrder.add(newItem);
         }
 
 
 		newOrder.setUser(user);
 		newOrder.setStore(store);
-		newOrder.setProducts(products);
+		newOrder.setItems(itemsOrder);
+
 
 		double total = 0.0;
 
-		for (int i = 0; i < newOrder.getProducts().size(); i++) {
-			total = total + newOrder.getProducts().get(i).getPrice();
+		for (int i = 0; i < newOrder.getItems().size(); i++) {
+			total = total + newOrder.getItems().get(i).getPrice() * newOrder.getItems().get(i).getQuantity();
 		}
 
 		newOrder.setTotal(total);
@@ -91,9 +100,11 @@ public class OrderService {
 	}
 
 	public List<OrderResponse> findOrdersByStoreEmail(String email){
-		List<Order> orders = this.repository.findOrdersByStoreEmail(email);
+		List<Order> orders = this.repository.findOrdersByStoreEmailOrderByCreatedAt(email);
 
 		List<OrderResponse> orderResponses = new ArrayList<>();
+
+		System.out.println(orderResponses);
 
 		for (Order order: orders) {
 			orderResponses.add(order.getOrderResponse(this.addressRepository));
@@ -103,7 +114,7 @@ public class OrderService {
 
 	public List<OrderResponse> findOrdersByStoreEmailToday(String email){
 		LocalDateTime date = LocalDateTime.now();
-		List<Order> orders = this.repository.findOrdersByStoreEmailAndCreatedAt_DayOfMonth(email, date.getDayOfMonth());
+		List<Order> orders = this.repository.findOrdersByStoreEmailAndCreatedAt_DayOfMonthOrderByCreatedAt(email, date.getDayOfMonth());
 
 		List<OrderResponse> orderResponses = new ArrayList<>();
 
