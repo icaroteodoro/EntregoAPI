@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity(name = "users")
 @Table(name = "users")
@@ -43,6 +44,7 @@ public class User {
 	@JsonIgnore
 	private LocalDateTime createdAt;
 	@JsonIgnore
+	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 	@OneToMany
 	@JsonIgnore
