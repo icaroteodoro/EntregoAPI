@@ -19,8 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-
+import org.hibernate.annotations.UpdateTimestamp;
 
 
 @Entity(name = "orders")
@@ -43,11 +42,12 @@ public class Order {
 	@ManyToOne
 	private Store store;
 	@ManyToMany
-	private List<Product> products;
+	private List<ItemOrder> items;
 
 	private PaymentMethod paymentMethod;
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
+	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
 	public Order(OrderDTO data) {
@@ -64,40 +64,18 @@ public class Order {
 		return String.valueOf(randomNumber);
 	}
 
-	public List<ItemsOrderResponse> getListItems() {
-		List<Product> products = this.getProducts();
-		List<ItemsOrderResponse> items = new ArrayList<>();
-
-		Map<Product, Integer> productCount = new HashMap<>();
-
-		for (Product product : products) {
-			productCount.put(product, productCount.getOrDefault(product, 0) + 1);
-		}
-
-		for (Map.Entry<Product, Integer> entry : productCount.entrySet()) {
-			Product product = entry.getKey();
-			int quantity = entry.getValue();
-			double totalPrice = product.getPrice() * quantity;
-
-			items.add(new ItemsOrderResponse(
-					product.getName(),
-					totalPrice,
-					quantity
-			));
-		}
-		return items;
-	}
 
 	public OrderResponse getOrderResponse(AddressRepository addressRepository) {
         return new OrderResponse(
 				this.getId(),
 				this.getUser().getFirstName() + " " + this.getUser().getLastName(),
 				this.getNumberOrder(),
+				this.getTotal(),
 				this.getCreatedAt(),
 				this.getStatus(),
 				addressRepository.findAddressByUserIdAndIsMain(this.getUser().getId()),
 				this.getPaymentMethod(),
-				this.getListItems()
+				this.getItems()
 		);
 	}
 
