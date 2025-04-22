@@ -22,11 +22,12 @@ public class NotificationService {
                 order.getId(),
                 order.getUser().getFirstName() +" "+order.getUser().getLastName(),
                 order.getNumberOrder(),
+                order.getTotal(),
                 order.getCreatedAt(),
                 order.getStatus(),
                 this.addressService.findAddressByUserIdAndIsMain(order.getUser().getId()),
                 order.getPaymentMethod(),
-                order.getListItems()
+                order.getItems()
         );
         messagingTemplate.convertAndSend("/topic/orders/" + order.getStore().getId(), notification);
     }
