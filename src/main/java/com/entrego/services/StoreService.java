@@ -7,12 +7,14 @@ import com.entrego.domain.Store;
 import com.entrego.dtos.*;
 import com.entrego.enums.StoreCategoryEnum;
 import com.entrego.enums.StoreStatus;
+import com.entrego.infra.storage.FirebaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.entrego.domain.Address;
 import com.entrego.repositories.StoreRepository;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class StoreService {
@@ -24,6 +26,9 @@ public class StoreService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private FirebaseService firebaseService;
 
 	public Store findStoreById(String id) throws Exception {
 		return this.repository.findById(id).orElseThrow(() -> new RuntimeException("Store not found"));
@@ -52,6 +57,44 @@ public class StoreService {
 		store.setCategory(data.category());
 
 		return this.repository.save(store);
+	}
+
+	public String updateStoreProfileImage(String storeEmail, MultipartFile file) throws Exception {
+		Store store = this.findStoreByEmail(storeEmail);
+
+		if(store.getUrlProfileImage() == null){
+			String url = this.firebaseService.uploadStoreProfileImage(file,store.getName());
+			store.setUrlProfileImage(url);
+			this.repository.save(store);
+
+			return url;
+		}
+
+		this.firebaseService.deleteImage(store.getUrlProfileImage());
+
+		String url = this.firebaseService.uploadStoreProfileImage(file,store.getName());
+		store.setUrlProfileImage(url);
+		this.repository.save(store);
+
+		return url;
+
+	}
+
+	public String updateStoreCoverImage(String storeEmail, MultipartFile file) throws Exception {
+		Store store = this.findStoreByEmail(storeEmail);
+		if(store.getUrlCoverImage() == null){
+			String url = this.firebaseService.uploadStoreCoverImage(file, store.getName());
+			store.setUrlCoverImage(url);
+			this.repository.save(store);
+
+			return url;
+		}
+		this.firebaseService.deleteImage(store.getUrlCoverImage());
+		String url = this.firebaseService.uploadStoreCoverImage(file, store.getName());
+		store.setUrlCoverImage(url);
+		this.repository.save(store);
+
+		return url;
 	}
 
 
