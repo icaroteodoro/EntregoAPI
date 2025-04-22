@@ -7,5 +7,4 @@ import java.util.List;
 
 public interface ProductCategoryRepository extends JpaRepository<ProductCategory, String> {
     List<ProductCategory> findProductCategoriesByStoreEmail(String email);
-
 }

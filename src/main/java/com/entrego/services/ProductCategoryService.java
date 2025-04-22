@@ -25,6 +25,12 @@ public class ProductCategoryService {
         return newProductCategory;
     }
 
+
+    public void deleteProductCategoryById(String id) {
+        this.productCategoryRepository.deleteById(id);
+    }
+
+
     public ProductCategory findProductCategoryById(String productCategoryId) throws Exception {
         return this.productCategoryRepository.findById(productCategoryId).orElseThrow(() -> new Exception("Category not found"));
     }
