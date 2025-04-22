@@ -16,6 +16,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UpdateTimestamp;
+
 @Entity(name = "products")
 @Table(name = "products")
 @Setter
@@ -29,6 +31,7 @@ public class Product {
 	private String id;
 	private String name;
 	private Double price;
+	private String urlImage;
 	private int discount;
 	@ManyToOne
 	@JsonIgnore
@@ -36,6 +39,7 @@ public class Product {
 	@JsonIgnore
 	private LocalDateTime createdAt;
 	@JsonIgnore
+	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 	@ManyToOne
 	private ProductCategory productCategory;

@@ -21,6 +21,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity(name = "stores")
 @Table(name = "stores")
@@ -40,6 +41,8 @@ public class Store {
 	private String email;
 	private String password;
 	private String description;
+	private String urlProfileImage;
+	private String urlCoverImage;
 	private StoreCategoryEnum category;
 	private StoreStatus statusLive;
 	@OneToOne
@@ -58,6 +61,7 @@ public class Store {
 	@JsonIgnore
 	private LocalDateTime createdAt;
 	@JsonIgnore
+	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
 	public Store(RegisterStoreRequestDTO data) {

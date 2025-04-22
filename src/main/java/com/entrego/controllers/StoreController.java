@@ -6,18 +6,20 @@ import com.entrego.domain.Address;
 import com.entrego.dtos.*;
 import com.entrego.enums.StoreCategoryEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.entrego.domain.Store;
 import com.entrego.services.StoreService;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/store")
 public class StoreController {
 	@Autowired
 	private StoreService storeService;
-	
-	
+
 	@PostMapping
 	private Store saveStore(@RequestBody RegisterStoreRequestDTO data) {
 		return storeService.createStore(data);
@@ -43,6 +45,26 @@ public class StoreController {
 	@RequestMapping("/update-status")
 	public Store updateStoreStatus(@RequestBody RequestUpdateStoreStatus data) throws Exception {
 		return storeService.updateStoreStatus(data);
+	}
+
+	@PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+	@RequestMapping("update-cover/{email}")
+	public ResponseEntity<ImageDTO> updateStoreCoverImage(@PathVariable String email, @RequestParam("file") MultipartFile file) throws Exception {
+
+		String urlImage = this.storeService.updateStoreCoverImage(email, file);
+		ImageDTO dto = new ImageDTO(urlImage);
+
+		return ResponseEntity.ok(dto);
+
+	}
+
+	@PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+	@RequestMapping("update-profile/{email}")
+	public ResponseEntity<ImageDTO> updateStoreProfileImage(@PathVariable String email, @RequestParam("file") MultipartFile file) throws Exception {
+		String urlImage =  this.storeService.updateStoreProfileImage(email, file);
+		ImageDTO dto = new ImageDTO(urlImage);
+
+		return ResponseEntity.ok(dto);
 	}
 
 	@PutMapping
