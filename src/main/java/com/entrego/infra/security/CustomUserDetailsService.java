@@ -1,4 +1,4 @@
-package api.ourwallet.infra.security;
+package com.entrego.infra.security;
 
 import com.entrego.repositories.StoreRepository;
 import com.entrego.repositories.UserRepository;
