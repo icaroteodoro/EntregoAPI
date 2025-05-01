@@ -42,7 +42,7 @@ public class AuthController {
         if(passwordEncoder.matches(body.password(), user.getPassword())) {
             String token = this.tokenService.generateTokenUser(user);
             String refreshToken = this.tokenService.generateRefreshTokenUser(user);
-            return ResponseEntity.ok(new LoginUserResponseDTO(user.getFirstName(), token, refreshToken));
+            return ResponseEntity.ok(new LoginUserResponseDTO(user.getFirstName() +" "+ user.getLastName(), token, refreshToken));
         }
         return ResponseEntity.notFound().build();
     }
@@ -53,7 +53,7 @@ public class AuthController {
             User newUser = this.userService.createUser(body);
             String token = this.tokenService.generateTokenUser(newUser);
             String refreshToken  = this.tokenService.generateRefreshTokenUser(newUser);
-            return ResponseEntity.ok(new LoginUserResponseDTO( newUser.getFirstName(), token, refreshToken));
+            return ResponseEntity.ok(new LoginUserResponseDTO( newUser.getFirstName() +" "+ newUser.getLastName(), token, refreshToken));
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
