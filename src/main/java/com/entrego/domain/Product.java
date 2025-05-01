@@ -1,16 +1,13 @@
 package com.entrego.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.entrego.dtos.ProductDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.google.type.Decimal;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,7 +27,7 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	private String name;
-	private Double price;
+	private BigDecimal price;
 	private String urlImage;
 	private int discount;
 	@ManyToOne

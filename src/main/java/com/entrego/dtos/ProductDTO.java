@@ -1,8 +1,8 @@
 package com.entrego.dtos;
 
 
-import com.entrego.domain.ProductCategory;
+import java.math.BigDecimal;
 
-public record ProductDTO(String name, Double price, String productCategoryId, int discount, String storeId) {
+public record ProductDTO(String name, BigDecimal price, String productCategoryId, int discount, String storeId) {
 
 }

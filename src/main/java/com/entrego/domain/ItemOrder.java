@@ -1,7 +1,10 @@
 package com.entrego.domain;
 
+import com.google.type.Decimal;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity(name = "items")
 @Table(name = "items")
@@ -16,7 +19,8 @@ public class ItemOrder {
     private String id;
 
     private String name;
-    private Double price;
+
+    private BigDecimal price;
 
     private int quantity;
 

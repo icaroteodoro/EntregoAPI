@@ -1,5 +1,6 @@
 package com.entrego.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +37,7 @@ public class Order {
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
 	private String numberOrder;
-	private double total;
+	private BigDecimal total;
 	@ManyToOne
 	private User user;
 	@ManyToOne

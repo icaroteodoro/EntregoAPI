@@ -3,6 +3,7 @@ package com.entrego.services;
 
 
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -68,10 +69,10 @@ public class OrderService {
 		newOrder.setItems(itemsOrder);
 
 
-		double total = 0.0;
+		BigDecimal total = new BigDecimal(0);
 
 		for (int i = 0; i < newOrder.getItems().size(); i++) {
-			total = total + newOrder.getItems().get(i).getPrice() * newOrder.getItems().get(i).getQuantity();
+			total.add(newOrder.getItems().get(i).getPrice().multiply(new BigDecimal(newOrder.getItems().get(i).getQuantity())));
 		}
 
 		newOrder.setTotal(total);
