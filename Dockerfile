@@ -1,14 +1,19 @@
-# Use uma imagem base com o JDK (versão adequada)
-FROM openjdk:17-jdk-slim
-
-# Defina o diretório de trabalho no contêiner
+# Stage 1: Build da aplicação
+FROM maven:3.8.4-openjdk-17-slim AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copie o arquivo JAR gerado para dentro do contêiner
-COPY target/your-app-name.jar app.jar
+# Stage 2: Imagem final
+FROM openjdk:17-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 
-# Exponha a porta que a aplicação vai rodar
+# Variáveis de ambiente para configuração do banco de dados
+ENV SPRING_DATASOURCE_URL=jdbc:mysql://bom9n6o99sz2sm3vgqwq-mysql.services.clever-cloud.com/bom9n6o99sz2sm3vgqwq
+ENV SPRING_DATASOURCE_USERNAME=uyo6kx5tiy7u8lrg
+ENV SPRING_DATASOURCE_PASSWORD=JwTzQc8BGPCCit3ewIHM
+
 EXPOSE 8080
-
-# Comando para rodar a aplicação
 ENTRYPOINT ["java", "-jar", "app.jar"]
