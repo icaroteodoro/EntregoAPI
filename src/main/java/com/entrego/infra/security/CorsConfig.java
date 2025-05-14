@@ -15,8 +15,9 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOriginPatterns(
                                 "http://localhost:*",
-                                "http://192.168.0.102:8081",
-                                "exp://192.168.0.102:8081"
+                                "http://192.168.0.101:8081",
+                                "exp://192.168.0.101:8081",
+                                "https://entrego-store.netlify.app/"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")

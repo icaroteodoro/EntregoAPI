@@ -4,7 +4,6 @@ import com.entrego.domain.Store;
 import com.entrego.domain.User;
 import com.entrego.dtos.*;
 import com.entrego.infra.security.TokenService;
-import com.entrego.repositories.StoreRepository;
 import com.entrego.repositories.UserRepository;
 import com.entrego.services.StoreService;
 import com.entrego.services.UserService;

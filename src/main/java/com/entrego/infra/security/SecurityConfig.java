@@ -56,17 +56,5 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-    //    @Bean
-    //    public CorsConfigurationSource corsConfigurationSource() {
-    //        CorsConfiguration configuration = new CorsConfiguration();
-    //        configuration.setAllowedOrigins(Arrays.asList("*"));
-    //        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    //        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
-    //        configuration.setExposedHeaders(Arrays.asList("x-auth-token"));
-    //        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    //        source.registerCorsConfiguration("/**", configuration);
-    //        return source;
-    //    }
-    // talvez não precise por que já tem um configuração de cors em./CorsFilter e ./CorsFilter
 
 }

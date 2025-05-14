@@ -4,20 +4,24 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 public class FirebaseConfig {
 
-    @Bean
+    @PostConstruct
     public void initialize() {
         try {
-            FileInputStream serviceAccount =
-                    new FileInputStream("src/main/resources/firebase/serviceAccountKey.json");
+            String firebaseConfig = System.getenv("FIREBASE_CONFIG_JSON");
+            if (firebaseConfig == null || firebaseConfig.isEmpty()) {
+                throw new IllegalStateException("Variável de ambiente FIREBASE_CONFIG_JSON não está definida");
+            }
+
+            InputStream serviceAccount = new ByteArrayInputStream(firebaseConfig.getBytes(StandardCharsets.UTF_8));
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -26,12 +30,11 @@ public class FirebaseConfig {
 
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
+                System.out.println("🔥 Firebase inicializado com sucesso!");
             }
 
-            System.out.println("🔥 Firebase inicializado com sucesso!");
-
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Erro ao inicializar Firebase: " + e.getMessage());
         }
     }
 }
