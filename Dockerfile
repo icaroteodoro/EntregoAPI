@@ -1,20 +1,14 @@
-FROM ubuntu:latest AS build
+# Use uma imagem base com o JDK (versão adequada)
+FROM openjdk:17-jdk-slim
 
+# Defina o diretório de trabalho no contêiner
+WORKDIR /app
 
-RUN apt-get update
-RUN apt-get install openjdk-17-jdk -y
+# Copie o arquivo JAR gerado para dentro do contêiner
+COPY target/your-app-name.jar app.jar
 
-COPY . .
-
-RUN apt-get install maven -y
-
-
-RUN mvn clean install
-
-FROM openjdk:17-jdk-slim-bullseye
-
+# Exponha a porta que a aplicação vai rodar
 EXPOSE 8080
 
-COPY --from=build /target/todolist-1.0.0.jar app.jar
-
+# Comando para rodar a aplicação
 ENTRYPOINT ["java", "-jar", "app.jar"]
