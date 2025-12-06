@@ -41,12 +41,38 @@ public class Product {
 	@ManyToOne
 	private ProductCategory productCategory;
 
+	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+	private java.util.List<ProductOptionGroup> optionGroups;
+
 	public Product(ProductDTO data) {
 		this.name = data.name();
 		this.price = data.price();
 		this.discount = data.discount();
 		this.createdAt = LocalDateTime.now();
 		this.updatedAt = LocalDateTime.now();
+
+		if (data.optionGroups() != null) {
+			this.optionGroups = data.optionGroups().stream().map(groupDTO -> {
+				ProductOptionGroup group = new ProductOptionGroup();
+				group.setName(groupDTO.name());
+				group.setMinSelection(groupDTO.minSelection());
+				group.setMaxSelection(groupDTO.maxSelection());
+				group.setProduct(this);
+
+				if (groupDTO.options() != null) {
+					group.setOptions(groupDTO.options().stream().map(optionDTO -> {
+						ProductOption option = new ProductOption();
+						option.setName(optionDTO.name());
+						option.setDescription(optionDTO.description());
+						option.setPrice(optionDTO.price());
+						option.setIsAvailable(optionDTO.isAvailable());
+						option.setGroup(group);
+						return option;
+					}).collect(java.util.stream.Collectors.toList()));
+				}
+				return group;
+			}).collect(java.util.stream.Collectors.toList());
+		}
 	}
 	
 	

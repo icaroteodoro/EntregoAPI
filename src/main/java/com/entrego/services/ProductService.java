@@ -69,6 +69,36 @@ public class ProductService {
 		ProductCategory productCategory = this.productCategoryService.findProductCategoryById(data.productCategoryId());
 		product.setProductCategory(productCategory);
 		product.setUpdatedAt(LocalDateTime.now());
+		
+		if (data.optionGroups() != null) {
+			if (product.getOptionGroups() != null) {
+				product.getOptionGroups().clear();
+			} else {
+				product.setOptionGroups(new java.util.ArrayList<>());
+			}
+			
+			product.getOptionGroups().addAll(data.optionGroups().stream().map(groupDTO -> {
+				com.entrego.domain.ProductOptionGroup group = new com.entrego.domain.ProductOptionGroup();
+				group.setName(groupDTO.name());
+				group.setMinSelection(groupDTO.minSelection());
+				group.setMaxSelection(groupDTO.maxSelection());
+				group.setProduct(product);
+
+				if (groupDTO.options() != null) {
+					group.setOptions(groupDTO.options().stream().map(optionDTO -> {
+						com.entrego.domain.ProductOption option = new com.entrego.domain.ProductOption();
+						option.setName(optionDTO.name());
+						option.setDescription(optionDTO.description());
+						option.setPrice(optionDTO.price());
+						option.setIsAvailable(optionDTO.isAvailable());
+						option.setGroup(group);
+						return option;
+					}).collect(java.util.stream.Collectors.toList()));
+				}
+				return group;
+			}).collect(java.util.stream.Collectors.toList()));
+		}
+
 		return this.repository.save(product);
 	}
 

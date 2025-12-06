@@ -16,12 +16,29 @@ public class FirebaseConfig {
     @PostConstruct
     public void initialize() {
         try {
-            String firebaseConfig = System.getenv("FIREBASE_CONFIG_JSON");
-            if (firebaseConfig == null || firebaseConfig.isEmpty()) {
-                throw new IllegalStateException("Variável de ambiente FIREBASE_CONFIG_JSON não está definida");
-            }
+            InputStream serviceAccount;
 
-            InputStream serviceAccount = new ByteArrayInputStream(firebaseConfig.getBytes(StandardCharsets.UTF_8));
+            // 1️⃣ Tenta carregar via variável de ambiente
+            String firebaseConfig = System.getenv("FIREBASE_CONFIG_JSON");
+
+            if (firebaseConfig != null && !firebaseConfig.isBlank()) {
+                System.out.println("🔧 Carregando credenciais Firebase da variável de ambiente...");
+                serviceAccount = new ByteArrayInputStream(
+                        firebaseConfig.getBytes(StandardCharsets.UTF_8)
+                );
+            } else {
+                // 2️⃣ Se não houver variável de ambiente, usa arquivo local
+                System.out.println("🔧 Variável de ambiente não encontrada. Tentando carregar serviceAccountKey.json...");
+                serviceAccount = getClass()
+                        .getClassLoader()
+                        .getResourceAsStream("serviceAccountKey.json");
+
+                if (serviceAccount == null) {
+                    throw new IllegalStateException(
+                            "Arquivo serviceAccountKey.json não encontrado em src/main/resources"
+                    );
+                }
+            }
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -34,7 +51,8 @@ public class FirebaseConfig {
             }
 
         } catch (Exception e) {
-            System.out.println("Erro ao inicializar Firebase: " + e.getMessage());
+            System.out.println("❌ Erro ao inicializar Firebase: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
