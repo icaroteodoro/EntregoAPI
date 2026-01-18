@@ -36,7 +36,7 @@ public class ProductCategoryService {
     }
 
     public List<ProductCategory> findProductCategoryByStoreEmail(String email) {
-        return this.productCategoryRepository.findProductCategoriesByStoreEmail(email);
+        return this.productCategoryRepository.findProductCategoriesByStoreAccountEmail(email);
     }
 
 

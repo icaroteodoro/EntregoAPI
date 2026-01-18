@@ -6,13 +6,8 @@ import java.util.List;
 import com.entrego.dtos.RegisterUserRequestDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,10 +28,10 @@ public class User {
 	private String id;
 	private String firstName;
 	private String lastName;
-	@Column(unique = true)
-	private String email;
-	@JsonIgnore
-	private String password;
+	@OneToOne
+	@JoinColumn(name = "account_id")
+	private Account account;
+
 	@Column(unique = true)
 	private String cell;
 	@Column(unique = true)
@@ -50,10 +45,10 @@ public class User {
 	@JsonIgnore
 	private List<Order> orders;
 
-	public User(RegisterUserRequestDTO data) {
+	public User(RegisterUserRequestDTO data, Account account) {
 		this.firstName = data.firstName();
 		this.lastName = data.lastName();
-		this.email = data.email();
+		this.account = account;
 		this.cell = data.cell();
 		this.document = data.document();
 		this.createdAt = LocalDateTime.now();

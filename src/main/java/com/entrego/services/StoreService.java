@@ -24,6 +24,9 @@ public class StoreService {
 	@Autowired
 	private AddressService addressService;
 
+	@Autowired
+	private com.entrego.repositories.AccountRepository accountRepository;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -35,12 +38,17 @@ public class StoreService {
 	}
 
 	public Store findStoreByEmail(String email) throws Exception {
-		return this.repository.findStoreByEmail(email).orElseThrow(() -> new RuntimeException("Email not found"));
+		var account = this.accountRepository.findAccountByEmail(email).orElseThrow(() -> new RuntimeException("Email not found"));
+		return this.repository.findStoreByAccount(account).orElseThrow(() -> new RuntimeException("Store not found"));
 	}
 
 	public Store createStore(RegisterStoreRequestDTO data) {
-		Store newStore = new Store(data);
-		newStore.setPassword(passwordEncoder.encode(data.password()));
+		if(this.accountRepository.findAccountByEmail(data.email()).isPresent()) throw new RuntimeException("Email already exists");
+
+		com.entrego.domain.Account newAccount = new com.entrego.domain.Account(data.email(), passwordEncoder.encode(data.password()), "STORE");
+		this.accountRepository.save(newAccount);
+
+		Store newStore = new Store(data, newAccount);
 		if(!Objects.equals(data.address().city(), "")) {
 			Address newAddress = this.addressService.createAddress(data.address());
 			newStore.setAddress(newAddress);

@@ -28,6 +28,7 @@ public class Product {
 	private String id;
 	private String name;
 	private BigDecimal price;
+	private BigDecimal minPrice;
 	private String urlImage;
 	private int discount;
 	@ManyToOne
@@ -47,6 +48,7 @@ public class Product {
 	public Product(ProductDTO data) {
 		this.name = data.name();
 		this.price = data.price();
+		this.minPrice = data.minPrice();
 		this.discount = data.discount();
 		this.createdAt = LocalDateTime.now();
 		this.updatedAt = LocalDateTime.now();

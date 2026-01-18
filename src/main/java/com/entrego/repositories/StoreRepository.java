@@ -10,6 +10,6 @@ import com.entrego.domain.Store;
 
 public interface StoreRepository extends JpaRepository<Store, String> {
 	Optional<Store> findStoreByDocument(String document);
-	Optional<Store> findStoreByEmail(String email);
 	List<Store> findStoresByCategory(StoreCategoryEnum category);
+	Optional<Store> findStoreByAccount(com.entrego.domain.Account account);
 }

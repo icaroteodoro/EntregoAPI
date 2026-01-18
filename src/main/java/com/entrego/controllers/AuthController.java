@@ -35,13 +35,28 @@ public class AuthController {
     @Autowired
     private TokenService tokenService;
 
-    @PostMapping("/user/login")
-    public ResponseEntity<?> userLogin(@RequestBody LoginUserRequestDTO body) {
-        User user = this.userRepository.findUserByEmail(body.email()).orElseThrow(() -> new RuntimeException("User not found"));
-        if(passwordEncoder.matches(body.password(), user.getPassword())) {
-            String token = this.tokenService.generateTokenUser(user);
-            String refreshToken = this.tokenService.generateRefreshTokenUser(user);
-            return ResponseEntity.ok(new LoginUserResponseDTO(user.getFirstName() +" "+ user.getLastName(), token, refreshToken));
+    @Autowired
+    private com.entrego.repositories.AccountRepository accountRepository;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginUserRequestDTO body) throws Exception {
+        com.entrego.domain.Account account = this.accountRepository.findAccountByEmail(body.email())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(passwordEncoder.matches(body.password(), account.getPassword())) {
+            String token = this.tokenService.generateToken(account);
+            String refreshToken = this.tokenService.generateRefreshToken(account);
+            String name = "";
+
+            if(account.getRole().equals("USER")) {
+                User user = this.userService.findUserByEmail(body.email());
+                name = user.getFirstName() + " " + user.getLastName();
+            } else {
+                 Store store = this.storeService.findStoreByEmail(body.email());
+                 name = store.getName();
+            }
+
+            return ResponseEntity.ok(new LoginUserResponseDTO(name, token, refreshToken));
         }
         return ResponseEntity.notFound().build();
     }
@@ -50,32 +65,20 @@ public class AuthController {
     public ResponseEntity<?> userRegister(@RequestBody RegisterUserRequestDTO body) {
         try{
             User newUser = this.userService.createUser(body);
-            String token = this.tokenService.generateTokenUser(newUser);
-            String refreshToken  = this.tokenService.generateRefreshTokenUser(newUser);
+            String token = this.tokenService.generateToken(newUser.getAccount());
+            String refreshToken  = this.tokenService.generateRefreshToken(newUser.getAccount());
             return ResponseEntity.ok(new LoginUserResponseDTO( newUser.getFirstName() +" "+ newUser.getLastName(), token, refreshToken));
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @PostMapping("/store/login")
-    public ResponseEntity<?> storeLogin(@RequestBody LoginUserRequestDTO body) throws Exception {
-        Store store = this.storeService.findStoreByEmail(body.email());
-        System.out.println(store.getName());
-        if(passwordEncoder.matches(body.password(), store.getPassword())) {
-            String token = this.tokenService.generateTokenStore(store);
-            String refreshToken = this.tokenService.generateRefreshTokenStore(store);
-            return ResponseEntity.ok(new LoginUserResponseDTO(store.getName(), token, refreshToken));
-        }
-        return ResponseEntity.notFound().build();
-    }
-
     @PostMapping("/store/register")
     public ResponseEntity<?> storeRegister(@RequestBody RegisterStoreRequestDTO body) {
         try{
             Store newStore = this.storeService.createStore(body);
-            String token = this.tokenService.generateTokenStore(newStore);
-            String refreshToken = this.tokenService.generateRefreshTokenStore(newStore);
+            String token = this.tokenService.generateToken(newStore.getAccount());
+            String refreshToken = this.tokenService.generateRefreshToken(newStore.getAccount());
             return ResponseEntity.ok(new LoginUserResponseDTO(newStore.getName(), token, refreshToken));
         }catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -83,26 +86,26 @@ public class AuthController {
     }
 
 
-    @PostMapping("/user/refresh-token")
-    public ResponseEntity<?> createNewTokenForUser(@RequestBody RequestRefreshToken data) throws Exception {
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody RequestRefreshToken data) throws Exception {
         try{
-            String refresh = this.tokenService.validateToken(data.refreshToken());
-            User user = this.userService.findUserByEmail(refresh);
-            String token = this.tokenService.generateTokenUser(user);
-            String refreshToken = this.tokenService.generateRefreshTokenUser(user);
-            return ResponseEntity.ok(new LoginUserResponseDTO(user.getFirstName() +" "+ user.getLastName(), token, refreshToken));
-        } catch(Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-    @PostMapping("/store/refresh-token")
-    public ResponseEntity<?> createNewTokenForStore(@RequestBody RequestRefreshToken data) throws Exception {
-        try{
-            String refresh = this.tokenService.validateToken(data.refreshToken());
-            Store store = this.storeService.findStoreByEmail(refresh);
-            String token = this.tokenService.generateTokenStore(store);
-            String refreshToken = this.tokenService.generateRefreshTokenStore(store);
-            return ResponseEntity.ok(new LoginUserResponseDTO(store.getName(), token, refreshToken));
+            String email = this.tokenService.validateToken(data.refreshToken());
+            com.entrego.domain.Account account = this.accountRepository.findAccountByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            String token = this.tokenService.generateToken(account);
+            String refreshToken = this.tokenService.generateRefreshToken(account);
+            String name = "";
+
+             if(account.getRole().equals("USER")) {
+                User user = this.userService.findUserByEmail(email);
+                name = user.getFirstName() + " " + user.getLastName();
+            } else {
+                 Store store = this.storeService.findStoreByEmail(email);
+                 name = store.getName();
+            }
+
+            return ResponseEntity.ok(new LoginUserResponseDTO(name, token, refreshToken));
         } catch(Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }

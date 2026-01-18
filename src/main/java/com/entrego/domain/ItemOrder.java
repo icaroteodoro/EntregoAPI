@@ -24,5 +24,8 @@ public class ItemOrder {
 
     private int quantity;
 
+    @OneToMany(mappedBy = "itemOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<ItemOrderOption> options;
+
 
 }

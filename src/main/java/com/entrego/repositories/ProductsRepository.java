@@ -7,6 +7,6 @@ import com.entrego.domain.Product;
 import java.util.List;
 
 public interface ProductsRepository extends JpaRepository<Product, String> {
-    List<Product> findProductsByStoreEmail(String email);
+    List<Product> findProductsByStoreAccountEmail(String email);
     void deleteAllByProductCategoryId(String id);
 }

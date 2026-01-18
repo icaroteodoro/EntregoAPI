@@ -28,6 +28,9 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Autowired
     private StoreRepository storeRepository;
 
+    @Autowired
+    private com.entrego.repositories.AccountRepository accountRepository;
+
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
@@ -51,18 +54,30 @@ public class SecurityFilter extends OncePerRequestFilter {
             Object authenticatedEntity = null;
             List<SimpleGrantedAuthority> authorities;
 
-            var user = userRepository.findUserByEmail(login);
-            if (user.isPresent()) {
-                authenticatedEntity = user.get();
-                authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
-            } else {
-                var store = storeRepository.findStoreByEmail(login);
-                if (store.isPresent()) {
-                    authenticatedEntity = store.get();
-                    authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_STORE"));
+            var account = accountRepository.findAccountByEmail(login);
+            
+            if(account.isPresent()) {
+                if(account.get().getRole().equals("USER")) {
+                    var user = userRepository.findUserByAccount(account.get());
+                    if(user.isPresent()) {
+                        authenticatedEntity = user.get();
+                        authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+                    } else {
+                        throw new RuntimeException("User linked to Account not found");
+                    }
+                } else if(account.get().getRole().equals("STORE")) {
+                    var store = storeRepository.findStoreByAccount(account.get());
+                    if(store.isPresent()) {
+                        authenticatedEntity = store.get();
+                        authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_STORE"));
+                    } else {
+                        throw new RuntimeException("Store linked to Account not found");
+                    }
                 } else {
-                    throw new RuntimeException("User not found");
+                    throw new RuntimeException("Unknown Role");
                 }
+            } else {
+                throw new RuntimeException("Account not found");
             }
 
             var authentication = new UsernamePasswordAuthenticationToken(authenticatedEntity, null, authorities);

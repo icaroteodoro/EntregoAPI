@@ -42,6 +42,9 @@ public class OrderService {
 	@Autowired
 	private NotificationService notificationService;
 
+	@Autowired
+	private ProductOptionRepository productOptionRepository;
+
 	public Order createOrder(OrderDTO request) throws Exception {
 		Order newOrder = new Order(request);
 
@@ -55,7 +58,30 @@ public class OrderService {
             Product product = this.productService.findProductById(item.productId());
 			ItemOrder itemRequest = new ItemOrder();
 			itemRequest.setName(product.getName());
-			itemRequest.setPrice(product.getPrice());
+			
+			BigDecimal price = product.getPrice();
+			List<ItemOrderOption> selectedOptions = new ArrayList<>();
+
+			if (item.options() != null && !item.options().isEmpty()) {
+				for (String optionId : item.options()) {
+					ProductOption option = this.productOptionRepository.findById(optionId)
+							.orElseThrow(() -> new Exception("Option not found: " + optionId));
+					// TODO: Add validation to check if option belongs to product's group
+					if (option.getPrice() != null) {
+						price = price.add(option.getPrice());
+					}
+					// Create decoupled ItemOrderOption
+					ItemOrderOption orderOption = new ItemOrderOption(option.getName(), option.getPrice(), itemRequest);
+					selectedOptions.add(orderOption);
+				}
+				itemRequest.setOptions(selectedOptions);
+			}
+
+			if(product.getMinPrice() != null) {
+				price = price.max(product.getMinPrice());
+			}
+			
+			itemRequest.setPrice(price);
 			itemRequest.setQuantity(item.quantity());
 
 			ItemOrder newItem = this.itemOrderRepository.save(itemRequest);
@@ -101,7 +127,7 @@ public class OrderService {
 	}
 
 	public List<OrderResponse> findOrdersByStoreEmail(String email){
-		List<Order> orders = this.repository.findOrdersByStoreEmailOrderByCreatedAt(email);
+		List<Order> orders = this.repository.findOrdersByStoreAccountEmailOrderByCreatedAt(email);
 
 		List<OrderResponse> orderResponses = new ArrayList<>();
 
@@ -115,7 +141,7 @@ public class OrderService {
 
 	public List<OrderResponse> findOrdersByStoreEmailToday(String email){
 		LocalDateTime date = LocalDateTime.now();
-		List<Order> orders = this.repository.findOrdersByStoreEmailAndCreatedAt_DayOfMonthOrderByCreatedAt(email, date.getDayOfMonth());
+		List<Order> orders = this.repository.findOrdersByStoreAccountEmailAndCreatedAt_DayOfMonthOrderByCreatedAt(email, date.getDayOfMonth());
 
 		List<OrderResponse> orderResponses = new ArrayList<>();
 
