@@ -8,14 +8,7 @@ import com.entrego.dtos.RegisterStoreRequestDTO;
 import com.entrego.enums.StoreCategoryEnum;
 import com.entrego.enums.StoreStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,11 +28,13 @@ public class Store {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	private String name;
+	@OneToOne
+	@JoinColumn(name = "account_id")
+	private Account account;
+
 	@Column(unique = true)
 	private String document;
-	@Column(unique = true)
-	private String email;
-	private String password;
+
 	private String description;
 	private String urlProfileImage;
 	private String urlCoverImage;
@@ -64,10 +59,10 @@ public class Store {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 
-	public Store(RegisterStoreRequestDTO data) {
+	public Store(RegisterStoreRequestDTO data, Account account) {
 		this.name = data.name();
 		this.document = data.document();
-		this.email = data.email();
+		this.account = account;
 		this.description = data.description();
 		this.address = new Address(data.address());
 		this.statusLive = StoreStatus.fromValue("CLOSED");

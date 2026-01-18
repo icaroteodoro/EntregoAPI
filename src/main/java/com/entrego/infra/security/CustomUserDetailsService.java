@@ -1,7 +1,6 @@
 package com.entrego.infra.security;
 
-import com.entrego.repositories.StoreRepository;
-import com.entrego.repositories.UserRepository;
+import com.entrego.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,33 +13,21 @@ import java.util.Collections;
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private StoreRepository storeRepository;
+    private AccountRepository accountRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserDetails userDetails;
 
-        var user = userRepository.findUserByEmail(email);
-        if (user.isPresent()) {
+        var account = accountRepository.findAccountByEmail(email);
+        if (account.isPresent()) {
             userDetails = new org.springframework.security.core.userdetails.User(
-                    user.get().getEmail(),
-                    user.get().getPassword(),
-                    Collections.singletonList(() -> "ROLE_USER")
+                    account.get().getEmail(),
+                    account.get().getPassword(),
+                    Collections.singletonList(() -> "ROLE_" + account.get().getRole())
             );
         } else {
-            var store = storeRepository.findStoreByEmail(email);
-            if (store.isPresent()) {
-                userDetails = new org.springframework.security.core.userdetails.User(
-                        store.get().getEmail(),
-                        store.get().getPassword(),
-                        Collections.singletonList(() -> "ROLE_STORE")
-                );
-            } else {
-                throw new UsernameNotFoundException("User or Store not found");
-            }
+             throw new UsernameNotFoundException("User or Store not found");
         }
 
         return userDetails;

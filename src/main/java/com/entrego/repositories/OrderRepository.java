@@ -14,11 +14,11 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 	List<Order> findOrdersByUserId(String id);
 	List<Order> findOrdersByStoreId(String id);
 
-	List<Order> findOrdersByStoreEmailOrderByCreatedAt(String email);
+	List<Order> findOrdersByStoreAccountEmailOrderByCreatedAt(String email);
 
 
-	@Query("SELECT o FROM orders o WHERE o.store.email = :email AND DAY(o.createdAt) = :dayOfMonth")
-	List<Order> findOrdersByStoreEmailAndCreatedAt_DayOfMonthOrderByCreatedAt(@Param("email") String email, @Param("dayOfMonth") int dayOfMonth);
+	@Query("SELECT o FROM orders o WHERE o.store.account.email = :email AND DAY(o.createdAt) = :dayOfMonth")
+	List<Order> findOrdersByStoreAccountEmailAndCreatedAt_DayOfMonthOrderByCreatedAt(@Param("email") String email, @Param("dayOfMonth") int dayOfMonth);
 
 
 

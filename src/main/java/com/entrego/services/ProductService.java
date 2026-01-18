@@ -54,7 +54,7 @@ public class ProductService {
 	}
 
 	public List<Product> findProductsByStoreEmail(String email){
-		return this.repository.findProductsByStoreEmail(email);
+		return this.repository.findProductsByStoreAccountEmail(email);
 	}
 	
 	public void saveProduct(Product product) {
@@ -65,6 +65,7 @@ public class ProductService {
 		Product product = this.repository.findById(id).orElseThrow(() -> new Exception("Product not found"));
 		product.setName(data.name());
 		product.setPrice(data.price());
+		product.setMinPrice(data.minPrice());
 		product.setDiscount(data.discount());
 		ProductCategory productCategory = this.productCategoryService.findProductCategoryById(data.productCategoryId());
 		product.setProductCategory(productCategory);

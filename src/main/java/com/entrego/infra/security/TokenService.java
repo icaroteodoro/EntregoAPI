@@ -22,14 +22,14 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
-    public String generateTokenUser(User user) {
+    public String generateToken(com.entrego.domain.Account account) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-
+            int expirationHours = account.getRole().equals("STORE") ? 2 : 1;
             return  JWT.create()
                     .withIssuer("login-auth-api")
-                    .withSubject(user.getEmail())
-                    .withExpiresAt(this.generateExpirationDate(1))
+                    .withSubject(account.getEmail())
+                    .withExpiresAt(this.generateExpirationDate(expirationHours))
                     .sign(algorithm);
 
         }catch (JWTCreationException exception) {
@@ -37,43 +37,13 @@ public class TokenService {
         }
     }
 
-    public String generateRefreshTokenUser(User user) {
+    public String generateRefreshToken(com.entrego.domain.Account account) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
             return  JWT.create()
                     .withIssuer("login-auth-api")
-                    .withSubject(user.getEmail())
-                    .withExpiresAt(this.generateExpirationDate(720))
-                    .sign(algorithm);
-
-        }catch (JWTCreationException exception) {
-            throw new RuntimeException("Error while authenticating");
-        }
-    }
-
-    public String generateTokenStore(Store store) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-
-            return  JWT.create()
-                    .withIssuer("login-auth-api")
-                    .withSubject(store.getEmail())
-                    .withExpiresAt(this.generateExpirationDate(2))
-                    .sign(algorithm);
-
-        }catch (JWTCreationException exception) {
-            throw new RuntimeException("Error while authenticating");
-        }
-    }
-
-    public String generateRefreshTokenStore(Store store) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-
-            return  JWT.create()
-                    .withIssuer("login-auth-api")
-                    .withSubject(store.getEmail())
+                    .withSubject(account.getEmail())
                     .withExpiresAt(this.generateExpirationDate(720))
                     .sign(algorithm);
 
