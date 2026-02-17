@@ -1,8 +1,8 @@
 package com.entrego.domain;
 
-import com.entrego.dtos.AddressDTO;
+import com.entrego.dtos.address.AddressDTO;
 
-import com.entrego.dtos.AddressStoreDTO;
+import com.entrego.dtos.store.request.AddressStoreDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

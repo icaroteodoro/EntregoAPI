@@ -8,15 +8,16 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import com.entrego.domain.*;
-import com.entrego.dtos.ItemOrderRequest;
-import com.entrego.dtos.ItemsOrderResponse;
-import com.entrego.dtos.OrderResponse;
+import com.entrego.domain.OrderAddress;
+import com.entrego.dtos.order.ItemOrderRequest;
+import com.entrego.dtos.order.ItemsOrderResponse;
+import com.entrego.dtos.order.OrderResponse;
 import com.entrego.enums.OrderStatus;
 import com.entrego.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.entrego.dtos.OrderDTO;
+import com.entrego.dtos.order.OrderDTO;
 
 @Service
 public class OrderService {
@@ -89,16 +90,23 @@ public class OrderService {
 			itemsOrder.add(newItem);
         }
 
+		// Snapshot Address
+		Address mainAddress = this.addressRepository.findAddressByUserIdAndIsMain(user.getId());
+		if (mainAddress == null) {
+			throw new Exception("User has no main address configured");
+		}
+		OrderAddress snapshotAddress = new OrderAddress(mainAddress);
 
 		newOrder.setUser(user);
 		newOrder.setStore(store);
 		newOrder.setItems(itemsOrder);
+		newOrder.setAddress(snapshotAddress);
 
 
 		BigDecimal total = new BigDecimal(0);
 
 		for (int i = 0; i < newOrder.getItems().size(); i++) {
-			total.add(newOrder.getItems().get(i).getPrice().multiply(new BigDecimal(newOrder.getItems().get(i).getQuantity())));
+			total = total.add(newOrder.getItems().get(i).getPrice().multiply(new BigDecimal(newOrder.getItems().get(i).getQuantity())));
 		}
 
 		newOrder.setTotal(total);
@@ -134,7 +142,7 @@ public class OrderService {
 		System.out.println(orderResponses);
 
 		for (Order order: orders) {
-			orderResponses.add(order.getOrderResponse(this.addressRepository));
+			orderResponses.add(order.getOrderResponse());
 		}
 		return orderResponses;
 	}
@@ -146,7 +154,7 @@ public class OrderService {
 		List<OrderResponse> orderResponses = new ArrayList<>();
 
 		for (Order order: orders) {
-			orderResponses.add(order.getOrderResponse(this.addressRepository));
+			orderResponses.add(order.getOrderResponse());
 		}
 		return orderResponses;
 	}
@@ -155,7 +163,12 @@ public class OrderService {
 
 
 
-	public Order updateStatusOrder(Order order){
+	public Order updateStatusOrder(String orderId, OrderStatus status) throws Exception {
+		Order order = this.findOrderById(orderId);
+		if (order.getStatus() == OrderStatus.CANCELED) {
+			throw new Exception("Cannot update status of a canceled order");
+		}
+		order.setStatus(status);
 		return this.repository.save(order);
 	}
 

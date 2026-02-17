@@ -1,4 +1,6 @@
-package com.entrego.dtos;
+package com.entrego.dtos.user.request;
+
+import com.entrego.dtos.address.AddressDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;

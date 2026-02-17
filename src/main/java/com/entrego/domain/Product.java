@@ -3,7 +3,7 @@ package com.entrego.domain;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.entrego.dtos.ProductDTO;
+import com.entrego.dtos.product.ProductDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.type.Decimal;

@@ -1,4 +1,4 @@
-package com.entrego.dtos;
+package com.entrego.dtos.order;
 
 import com.entrego.enums.OrderStatus;
 

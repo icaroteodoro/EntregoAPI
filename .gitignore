@@ -1,3 +1,5 @@
 /src/main/resources/firebase
 /target/classes/firebase
 target
+AUTH_README.md
+/src/main/resources/serviceAccountKey.json

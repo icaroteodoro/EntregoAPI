@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.entrego.dtos.RegisterUserRequestDTO;
+import com.entrego.dtos.user.request.RegisterUserRequestDTO;
 import com.entrego.domain.Address;
 import com.entrego.domain.User;
 import com.entrego.repositories.UserRepository;

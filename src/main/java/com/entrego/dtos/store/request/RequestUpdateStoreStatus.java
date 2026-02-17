@@ -1,4 +1,4 @@
-package com.entrego.dtos;
+package com.entrego.dtos.store.request;
 
 import com.entrego.enums.StoreStatus;
 

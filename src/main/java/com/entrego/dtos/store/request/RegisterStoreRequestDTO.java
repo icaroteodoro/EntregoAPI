@@ -1,4 +1,6 @@
-package com.entrego.dtos;
+package com.entrego.dtos.store.request;
+
+import com.entrego.dtos.address.AddressDTO;
 
 import com.entrego.domain.Order;
 import com.entrego.domain.Product;
