@@ -1,7 +1,7 @@
 package com.entrego.controllers;
 
 import com.entrego.domain.ProductCategory;
-import com.entrego.dtos.RequestCreateProductCategory;
+import com.entrego.dtos.product.RequestCreateProductCategory;
 import com.entrego.services.ProductCategoryService;
 import com.entrego.services.ProductService;
 import jakarta.transaction.Transactional;

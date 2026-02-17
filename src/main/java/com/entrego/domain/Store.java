@@ -3,7 +3,7 @@ package com.entrego.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.entrego.dtos.RegisterStoreRequestDTO;
+import com.entrego.dtos.store.request.RegisterStoreRequestDTO;
 
 import com.entrego.enums.StoreCategoryEnum;
 import com.entrego.enums.StoreStatus;

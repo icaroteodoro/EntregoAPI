@@ -2,8 +2,8 @@ package com.entrego.controllers;
 
 import java.util.List;
 
-import com.entrego.dtos.AddressDTO;
-import com.entrego.dtos.AddressStoreDTO;
+import com.entrego.dtos.address.AddressDTO;
+import com.entrego.dtos.store.request.AddressStoreDTO;
 import com.entrego.services.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -6,10 +6,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import com.entrego.dtos.ItemsOrderResponse;
-import com.entrego.dtos.OrderDTO;
+import com.entrego.dtos.order.ItemsOrderResponse;
+import com.entrego.dtos.order.OrderDTO;
 
-import com.entrego.dtos.OrderResponse;
+import com.entrego.dtos.order.OrderResponse;
 import com.entrego.enums.OrderStatus;
 import com.entrego.enums.PaymentMethod;
 import com.entrego.repositories.AddressRepository;
@@ -66,7 +66,10 @@ public class Order {
 	}
 
 
-	public OrderResponse getOrderResponse(AddressRepository addressRepository) {
+	@Embedded
+	private OrderAddress address;
+
+	public OrderResponse getOrderResponse() {
         return new OrderResponse(
 				this.getId(),
 				this.getUser().getFirstName() + " " + this.getUser().getLastName(),
@@ -74,7 +77,7 @@ public class Order {
 				this.getTotal(),
 				this.getCreatedAt(),
 				this.getStatus(),
-				addressRepository.findAddressByUserIdAndIsMain(this.getUser().getId()),
+				this.getAddress(),
 				this.getPaymentMethod(),
 				this.getItems()
 		);

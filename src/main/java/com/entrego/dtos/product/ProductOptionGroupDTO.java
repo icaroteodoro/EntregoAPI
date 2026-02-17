@@ -1,4 +1,4 @@
-package com.entrego.dtos;
+package com.entrego.dtos.product;
 
 import java.util.List;
 

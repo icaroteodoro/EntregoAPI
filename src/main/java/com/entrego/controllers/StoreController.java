@@ -3,8 +3,14 @@ package com.entrego.controllers;
 import java.util.List;
 
 import com.entrego.domain.Address;
-import com.entrego.dtos.*;
-import com.entrego.enums.StoreCategoryEnum;
+import com.entrego.dtos.auth.*;
+import com.entrego.dtos.store.request.*;
+import com.entrego.dtos.store.response.*;
+import com.entrego.dtos.order.*;
+import com.entrego.dtos.product.*;
+import com.entrego.dtos.address.*;
+import com.entrego.dtos.common.*;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +27,13 @@ public class StoreController {
 	private StoreService storeService;
 
 	@PostMapping
-	private Store saveStore(@RequestBody RegisterStoreRequestDTO data) {
-		return storeService.createStore(data);
+	private StoreResponseDTO saveStore(@RequestBody RegisterStoreRequestDTO data) {
+		return new StoreResponseDTO(storeService.createStore(data));
 	}
 	
 	@GetMapping
-	private List<Store> allStores(){
-		return this.storeService.findAllStores();
+	private List<StoreResponseDTO> allStores(){
+		return this.storeService.findAllStores().stream().map(StoreResponseDTO::new).collect(Collectors.toList());
 	}
 	
 	//@GetMapping
@@ -37,14 +43,14 @@ public class StoreController {
 	//}
 	@GetMapping
 	@RequestMapping("/category")
-	public List<Store> findStoresByCategory(@RequestBody RequestStoreByCategory data) {
-		return storeService.findStoresByCategory(data.category());
+	public List<StoreResponseDTO> findStoresByCategory(@RequestBody RequestStoreByCategory data) {
+		return storeService.findStoresByCategory(data.category()).stream().map(StoreResponseDTO::new).collect(Collectors.toList());
 	}
 
 	@PutMapping
 	@RequestMapping("/update-status")
-	public Store updateStoreStatus(@RequestBody RequestUpdateStoreStatus data) throws Exception {
-		return storeService.updateStoreStatus(data);
+	public StoreResponseDTO updateStoreStatus(@RequestBody RequestUpdateStoreStatus data) throws Exception {
+		return new StoreResponseDTO(storeService.updateStoreStatus(data));
 	}
 
 	@PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -69,15 +75,15 @@ public class StoreController {
 
 	@PutMapping
 	@RequestMapping("/update/{email}")
-	public Store updateStore(@PathVariable String email, @RequestBody RequestUpdateStore data) throws Exception {
-		return this.storeService.updateStore(email, data);
+	public StoreResponseDTO updateStore(@PathVariable String email, @RequestBody RequestUpdateStore data) throws Exception {
+		return new StoreResponseDTO(this.storeService.updateStore(email, data));
 	}
 
 
 	@GetMapping
 	@RequestMapping("/{email}")
-	public Store findStoreByEmail(@PathVariable String email) throws Exception {
-		return this.storeService.findStoreByEmail(email);
+	public StoreResponseDTO findStoreByEmail(@PathVariable String email) throws Exception {
+		return new StoreResponseDTO(this.storeService.findStoreByEmail(email));
 	}
 
 	@GetMapping

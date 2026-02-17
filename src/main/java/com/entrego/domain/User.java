@@ -3,7 +3,7 @@ package com.entrego.domain;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.entrego.dtos.RegisterUserRequestDTO;
+import com.entrego.dtos.user.request.RegisterUserRequestDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnore;

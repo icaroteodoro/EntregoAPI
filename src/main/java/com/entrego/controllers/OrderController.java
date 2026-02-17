@@ -3,15 +3,15 @@ package com.entrego.controllers;
 import java.util.List;
 
 import com.entrego.domain.Order;
-import com.entrego.dtos.OrderResponse;
-import com.entrego.dtos.RequestOrderStatusUpdate;
-import com.entrego.dtos.RequestUpdateStatusOfRequest;
+import com.entrego.dtos.order.OrderResponse;
+import com.entrego.dtos.order.RequestOrderStatusUpdate;
+import com.entrego.dtos.order.RequestUpdateStatusOfRequest;
 import com.entrego.enums.OrderStatus;
 import com.entrego.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.entrego.dtos.OrderDTO;
+import com.entrego.dtos.order.OrderDTO;
 
 @RestController
 @RequestMapping("/order")
@@ -60,9 +60,7 @@ public class OrderController {
 
 	@PutMapping("/update")
 	public Order updateStatusOrder(@RequestBody RequestOrderStatusUpdate data) throws Exception {
-		Order order = this.orderService.findOrderById(data.orderId());
-		order.setStatus(data.status());
-		return this.orderService.updateStatusOrder(order);
+		return this.orderService.updateStatusOrder(data.orderId(), data.status());
 	}
 	
 }

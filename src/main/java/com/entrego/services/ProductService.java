@@ -12,7 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.entrego.dtos.ProductDTO;
+import com.entrego.dtos.product.ProductDTO;
 import com.entrego.domain.Product;
 import com.entrego.repositories.ProductsRepository;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +46,7 @@ public class ProductService {
 		String urlImage = firebaseService.uploadProductImage(productImage, newProduct.getName());
 
 		newProduct.setUrlImage(urlImage);
+		newProduct.setMinPrice(this.calculateMinPrice(newProduct));
 
 		this.saveProduct(newProduct);
 
@@ -99,6 +100,8 @@ public class ProductService {
 				return group;
 			}).collect(java.util.stream.Collectors.toList()));
 		}
+		
+		product.setMinPrice(this.calculateMinPrice(product));
 
 		return this.repository.save(product);
 	}
@@ -124,5 +127,25 @@ public class ProductService {
 		Product product = this.findProductById(productId);
 		this.firebaseService.deleteImage(product.getUrlImage());
 		this.repository.deleteById(productId);
+	}
+
+	private java.math.BigDecimal calculateMinPrice(Product product) {
+		java.math.BigDecimal minPrice = product.getPrice();
+		if (product.getOptionGroups() != null) {
+			for (com.entrego.domain.ProductOptionGroup group : product.getOptionGroups()) {
+				if (group.getMinSelection() != null && group.getMinSelection() > 0 && group.getOptions() != null) {
+					List<com.entrego.domain.ProductOption> sortedOptions = group.getOptions().stream()
+							.filter(opt -> opt.getIsAvailable() != null && opt.getIsAvailable())
+							.sorted(java.util.Comparator.comparing(com.entrego.domain.ProductOption::getPrice))
+							.limit(group.getMinSelection())
+							.collect(java.util.stream.Collectors.toList());
+
+					for (com.entrego.domain.ProductOption option : sortedOptions) {
+						minPrice = minPrice.add(option.getPrice());
+					}
+				}
+			}
+		}
+		return minPrice;
 	}
 }

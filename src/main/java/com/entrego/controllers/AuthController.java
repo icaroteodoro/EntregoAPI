@@ -2,7 +2,13 @@ package com.entrego.controllers;
 
 import com.entrego.domain.Store;
 import com.entrego.domain.User;
-import com.entrego.dtos.*;
+import com.entrego.dtos.auth.*;
+import com.entrego.dtos.store.request.*;
+import com.entrego.dtos.user.request.*;
+import com.entrego.dtos.order.*;
+import com.entrego.dtos.product.*;
+import com.entrego.dtos.address.*;
+import com.entrego.dtos.common.*;
 import com.entrego.infra.security.TokenService;
 import com.entrego.repositories.UserRepository;
 import com.entrego.services.StoreService;

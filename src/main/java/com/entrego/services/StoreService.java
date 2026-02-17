@@ -4,7 +4,13 @@ import java.util.List;
 import java.util.Objects;
 
 import com.entrego.domain.Store;
-import com.entrego.dtos.*;
+import com.entrego.dtos.auth.*;
+import com.entrego.dtos.store.request.*;
+import com.entrego.dtos.store.response.*;
+import com.entrego.dtos.order.*;
+import com.entrego.dtos.product.*;
+import com.entrego.dtos.address.*;
+import com.entrego.dtos.common.*;
 import com.entrego.enums.StoreCategoryEnum;
 import com.entrego.enums.StoreStatus;
 import com.entrego.infra.storage.FirebaseService;
